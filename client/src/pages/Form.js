@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Form steps components
-import RequesterInfo from '../components/form/RequesterInfo';
-import AdDetails from '../components/form/AdDetails';
-import Timeline from '../components/form/Timeline';
-import ContentInfo from '../components/form/ContentInfo';
-import FileUpload from '../components/form/FileUpload';
-import Confirmation from '../components/form/Confirmation';
+import RequesterInfo from '../components/RequesterInfo';
+import AdDetails from '../components/AdDetails';
+import Timeline from '../components/Timeline';
+import ContentInfo from '../components/ContentInfo';
+import FileUpload from '../components/FileUpload';
+import Confirmation from '../components/Confirmation';
 
 const Form = () => {
   const [step, setStep] = useState(0);
