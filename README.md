@@ -1,32 +1,128 @@
-# AmaraReach
+# AdAmara - Ad Request Management System
 
-> A clean, responsive web portal for Amaravati Communications to capture client ad-requests and follow up with tailored quotes.
+AdAmara is a full-stack application for managing advertising requests, featuring a multi-step form for users to submit requests and an admin dashboard for processing those requests.
 
-## 🚀 Project Overview
-**AmaraReach** guides your clients through:
-1. Browsing 📋 the full suite of marketing services  
-2. Selecting exactly what they need (Newspaper, Radio, TV/Cinema, Digital, Print Collateral)  
-3. Submitting all the details (state, area, content, delivery dates, etc.)  
-4. Letting your team review requirements and send a personalized quote  
+## 🚀 Features
 
-No pricing is shown up front—your team will handle that after review.
+- **Multi-step dynamic form** for submitting ad requests
+- **File upload** support for PDFs and images
+- **Admin dashboard** for managing requests
+- **Email notifications** for request status updates
+- **Responsive design** for mobile and desktop
+- **Secure authentication** for admin users
+- **Data export** capabilities
 
----
+## 📋 Prerequisites
 
-## 🔑 Key Features
-- **Services Catalog** with icon-driven overview  
-- **Dynamic Quote Form** that reveals only the fields relevant to the chosen service  
-- **State → Area → Brand** selectors for newspaper ads  
-- **Platform selectors** for digital campaigns (Facebook, Google, Instagram, etc.)  
-- **Content upload** (text copy + image/PDF attachments)  
-- **Submission confirmation** and email receipt for clients  
+- Node.js (v16+)
+- MongoDB (local or Atlas)
+- npm or yarn
+- AWS S3 bucket (for production)
 
----
+## 🛠️ Installation
 
-## 🛠️ Tech Stack (suggested)
-- **Frontend**: React (Create React App) or Next.js  
-- **Styling**: Tailwind CSS or plain SASS  
-- **Forms & Validation**: React Hook Form or Formik + Yup  
-- **Deployment**: Vercel / Netlify / GitHub Pages  
+1. **Clone the repository**
 
-*(Feel free to swap in your preferred frameworks.)*
+```bash
+git clone https://github.com/yourusername/adamara.git
+cd adamara
+```
+
+2. **Set up environment variables**
+
+```bash
+cp .env.sample .env
+```
+
+Edit the `.env` file with your configuration.
+
+3. **Install dependencies**
+
+```bash
+npm run install:all
+```
+
+4. **Start development servers**
+
+```bash
+npm run start
+```
+
+This will start both the client (React) and server (Node.js) concurrently.
+
+## 🗂️ Project Structure
+
+```
+adamara/
+├── client/                  # Frontend React application
+│   ├── public/              # Static files
+│   └── src/                 # Source files
+├── server/                  # Backend Node.js application
+│   ├── controllers/         # Route controllers
+│   ├── models/              # Database models
+│   ├── routes/              # API routes
+│   ├── services/            # Business logic
+│   ├── middleware/          # Express middleware
+│   ├── utils/               # Utility functions
+│   ├── config/              # Configuration files
+│   ├── app.js               # Express app setup
+│   └── server.js            # Server entry point
+├── .gitignore               # Git ignore file
+├── README.md                # Project documentation
+└── package.json             # Root package.json for scripts
+```
+
+## 🚢 Deployment
+
+### Backend Deployment
+
+1. Set up a MongoDB Atlas cluster
+2. Configure AWS S3 for file storage
+3. Deploy to Heroku, Render, or your preferred hosting:
+
+```bash
+heroku create
+git push heroku main
+```
+
+### Frontend Deployment
+
+1. Build the client:
+
+```bash
+cd client
+npm run build
+```
+
+2. Deploy to Vercel, Netlify, or similar:
+
+```bash
+npx vercel
+```
+
+## 📝 API Documentation
+
+### Authentication Endpoints
+
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/register` - Register a new admin (restricted)
+- `GET /api/auth/current` - Get current user info
+
+### Request Endpoints
+
+- `POST /api/requests` - Create a new request
+- `GET /api/requests` - Get all requests (with filtering)
+- `GET /api/requests/:id` - Get a single request by ID
+- `PUT /api/requests/:id` - Update a request
+- `GET /api/requests/export/csv` - Export requests as CSV
+
+## 🔒 Security Considerations
+
+- All routes requiring authentication are protected with JWT
+- Input validation is implemented on all endpoints
+- Rate limiting is applied to prevent abuse
+- File uploads are restricted by type and size
+
+## 🧪 Testing
+
+Run tests:
