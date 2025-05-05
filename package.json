@@ -1,0 +1,28 @@
+{
+    "name": "adamara",
+    "version": "1.0.0",
+    "description": "AdAmara - Ad Request Management System",
+    "main": "index.js",
+    "scripts": {
+      "start": "concurrently \"npm run server\" \"npm run client\"",
+      "server": "cd server && npm run dev",
+      "client": "cd client && npm start",
+      "install:all": "npm install && npm run install:client && npm run install:server",
+      "install:client": "cd client && npm install",
+      "install:server": "cd server && npm install",
+      "build": "cd client && npm run build",
+      "test": "concurrently \"cd server && npm test\" \"cd client && npm test\""
+    },
+    "keywords": [
+      "ad",
+      "request",
+      "form",
+      "dashboard",
+      "mern"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "concurrently": "^8.2.2"
+    }
+}
