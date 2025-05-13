@@ -8,13 +8,13 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="md:flex md:items-center md:justify-between">
           <div className="flex justify-center md:order-2 space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white">
+            <a href="/privacy-policy" className="text-gray-400 hover:text-white">
               Privacy Policy
             </a>
-            <a href="#" className="text-gray-400 hover:text-white">
+            <a href="/terms-of-service" className="text-gray-400 hover:text-white">
               Terms of Service
             </a>
-            <a href="#" className="text-gray-400 hover:text-white">
+            <a href="/contact" className="text-gray-400 hover:text-white">
               Contact Us
             </a>
           </div>

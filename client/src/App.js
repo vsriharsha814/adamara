@@ -9,6 +9,9 @@ import Dashboard from './pages/Dashboard';
 import RequestDetail from './pages/RequestDetail';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import ContactUs from './pages/ContactUs';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
             <Route path="/" element={<Navigate to="/request" />} />
             <Route path="/request" element={<Form />} />
             <Route path="/admin/login" element={<Login />} />
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             
             {/* Protected Admin Routes */}
             <Route path="/admin" element={

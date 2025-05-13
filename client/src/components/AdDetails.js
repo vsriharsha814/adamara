@@ -213,4 +213,4 @@ const AdDetails = () => {
   );
 };
 
-export default AdDetails;
+export default AdDetails; 

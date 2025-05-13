@@ -138,7 +138,7 @@ const FileUpload = ({ files, setFiles }) => {
             className="hidden"
           />
           
-          <label htmlFor="fileUpload" className="cursor-pointer">
+          <label htmlFor="fileUpload" className="cursor-pointer" aria-label="Upload file">
             <div className="flex flex-col items-center justify-center py-3">
               <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />

@@ -124,9 +124,9 @@ const Confirmation = () => {
           <h3 className="font-medium text-blue-800 mb-2">What happens next?</h3>
           <ol className="list-decimal pl-5 space-y-2 text-blue-700">
             <li>Your request will be reviewed by our team (1-2 business days)</li>
-            <li>You'll receive an email confirmation with your request details</li>
+            <li>You&apos;ll receive an email confirmation with your request details</li>
             <li>A team member may contact you if additional information is needed</li>
-            <li>You'll be notified when your request status changes</li>
+            <li>You&apos;ll be notified when your request status changes</li>
           </ol>
         </div>
         
