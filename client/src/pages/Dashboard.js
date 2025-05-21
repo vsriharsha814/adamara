@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import CustomDropdown from '../components/CustomDropdown';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -17,30 +16,7 @@ const Dashboard = () => {
     endDate: ''
   });
 
-  const statusFilterOptions = [
-    { value: '', label: 'All Statuses' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'in-review', label: 'In Review' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'completed', label: 'Completed' }
-  ];
-
-  const departmentFilterOptions = [
-    { value: '', label: 'All Departments' },
-    { value: 'Marketing', label: 'Marketing' },
-    { value: 'Sales', label: 'Sales' },
-    { value: 'Product', label: 'Product' },
-    { value: 'Engineering', label: 'Engineering' },
-    { value: 'HR', label: 'Human Resources' },
-    { value: 'Finance', label: 'Finance' },
-    { value: 'Operations', label: 'Operations' },
-    { value: 'Customer Support', label: 'Customer Support' },
-    { value: 'Other', label: 'Other' }
-  ];
-
-  // Fetch requests
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoading(true);
     setError('');
     
@@ -76,7 +52,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, filters]); // Add dependencies here
   
   // Handle filter changes
   const handleFilterChange = (e) => {
@@ -183,10 +159,10 @@ const Dashboard = () => {
     }
   };
   
-  // Fetch requests on mount and when filters/page change
+  // Fetch requests on mount and when currentPage changes
   useEffect(() => {
     fetchRequests();
-  }, [currentPage]);
+  }, [fetchRequests]); // fetchRequests is now a dependency
   
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -219,24 +195,44 @@ const Dashboard = () => {
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
-              <CustomDropdown
+              <select
+                id="status"
                 name="status"
-                options={statusFilterOptions}
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
                 value={filters.status}
                 onChange={handleFilterChange}
-              />
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in-review">In Review</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
             
             <div>
               <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
                 Department
               </label>
-              <CustomDropdown
+              <select
+                id="department"
                 name="department"
-                options={departmentFilterOptions}
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
                 value={filters.department}
                 onChange={handleFilterChange}
-              />
+              >
+                <option value="">All Departments</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Sales">Sales</option>
+                <option value="Product">Product</option>
+                <option value="Engineering">Engineering</option>
+                <option value="HR">Human Resources</option>
+                <option value="Finance">Finance</option>
+                <option value="Operations">Operations</option>
+                <option value="Customer Support">Customer Support</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
             
             <div>
