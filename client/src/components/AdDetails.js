@@ -3,8 +3,64 @@ import { useFormContext } from 'react-hook-form';
 import CustomDropdown from './CustomDropdown';
 
 const AdDetails = () => {
-  const { register, watch, formState: { errors } } = useFormContext();
+  const { register, watch, formState: { errors }, setValue } = useFormContext();
   const adType = watch('adType');
+  
+  // Define options for dropdowns
+  const adTypeOptions = [
+    { value: 'print', label: 'Print' },
+    { value: 'digital', label: 'Digital' },
+    { value: 'social', label: 'Social Media' },
+    { value: 'video', label: 'Video' },
+    { value: 'other', label: 'Other' }
+  ];
+  
+  const printSizeOptions = [
+    { value: 'fullPage', label: 'Full Page' },
+    { value: 'halfPage', label: 'Half Page' },
+    { value: 'quarterPage', label: 'Quarter Page' },
+    { value: 'custom', label: 'Custom Size' }
+  ];
+  
+  const printColorOptions = [
+    { value: 'fullColor', label: 'Full Color' },
+    { value: 'blackWhite', label: 'Black & White' },
+    { value: 'spotColor', label: 'Spot Color' }
+  ];
+  
+  const digitalFormatOptions = [
+    { value: 'banner', label: 'Banner Ad' },
+    { value: 'popup', label: 'Pop-up' },
+    { value: 'sidebar', label: 'Sidebar' },
+    { value: 'native', label: 'Native Ad' }
+  ];
+  
+  const digitalSizeOptions = [
+    { value: 'leaderboard', label: 'Leaderboard (728×90)' },
+    { value: 'medium', label: 'Medium Rectangle (300×250)' },
+    { value: 'skyscraper', label: 'Skyscraper (160×600)' },
+    { value: 'custom', label: 'Custom Size' }
+  ];
+  
+  const socialPlatformOptions = [
+    { value: 'facebook', label: 'Facebook' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'twitter', label: 'Twitter' },
+    { value: 'linkedin', label: 'LinkedIn' },
+    { value: 'tiktok', label: 'TikTok' }
+  ];
+  
+  const socialTypeOptions = [
+    { value: 'post', label: 'Regular Post' },
+    { value: 'story', label: 'Story' },
+    { value: 'carousel', label: 'Carousel' },
+    { value: 'video', label: 'Video' }
+  ];
+  
+  // Custom handler for dropdown change
+  const handleDropdownChange = (e) => {
+    setValue(e.target.name, e.target.value);
+  };
   
   return (
     <div>
@@ -12,27 +68,15 @@ const AdDetails = () => {
       
       <div className="space-y-4">
         <div>
-          <label htmlFor="adType" className="block mb-1 font-medium">
-            Ad Type <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="adType"
-            className={`w-full px-3 py-2 border rounded-md ${
-              errors.adType ? 'border-red-500' : 'border-gray-300'
-            }`}
-            {...register('adType', { 
-              required: 'Ad type is required' 
-            })}
-          >
-            <option value="print">Print</option>
-            <option value="digital">Digital</option>
-            <option value="social">Social Media</option>
-            <option value="video">Video</option>
-            <option value="other">Other</option>
-          </select>
-          {errors.adType && (
-            <p className="mt-1 text-sm text-red-500">{errors.adType.message}</p>
-          )}
+          <CustomDropdown
+            label="Ad Type"
+            name="adType"
+            options={adTypeOptions}
+            value={adType}
+            onChange={handleDropdownChange}
+            required={true}
+            error={errors.adType?.message}
+          />
         </div>
         
         {adType === 'print' && (
@@ -40,29 +84,22 @@ const AdDetails = () => {
             <h3 className="font-medium mb-2">Print Ad Options</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="printSize" className="block mb-1 text-sm">Size</label>
-                <select
-                  id="printSize"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('printSize')}
-                >
-                  <option value="fullPage">Full Page</option>
-                  <option value="halfPage">Half Page</option>
-                  <option value="quarterPage">Quarter Page</option>
-                  <option value="custom">Custom Size</option>
-                </select>
+                <CustomDropdown
+                  label="Size"
+                  name="printSize"
+                  options={printSizeOptions}
+                  value={watch('printSize')}
+                  onChange={handleDropdownChange}
+                />
               </div>
               <div>
-                <label htmlFor="printColor" className="block mb-1 text-sm">Color</label>
-                <select
-                  id="printColor"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('printColor')}
-                >
-                  <option value="fullColor">Full Color</option>
-                  <option value="blackWhite">Black & White</option>
-                  <option value="spotColor">Spot Color</option>
-                </select>
+                <CustomDropdown
+                  label="Color"
+                  name="printColor"
+                  options={printColorOptions}
+                  value={watch('printColor')}
+                  onChange={handleDropdownChange}
+                />
               </div>
             </div>
           </div>
@@ -73,30 +110,22 @@ const AdDetails = () => {
             <h3 className="font-medium mb-2">Digital Ad Options</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="digitalFormat" className="block mb-1 text-sm">Format</label>
-                <select
-                  id="digitalFormat"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('digitalFormat')}
-                >
-                  <option value="banner">Banner Ad</option>
-                  <option value="popup">Pop-up</option>
-                  <option value="sidebar">Sidebar</option>
-                  <option value="native">Native Ad</option>
-                </select>
+                <CustomDropdown
+                  label="Format"
+                  name="digitalFormat"
+                  options={digitalFormatOptions}
+                  value={watch('digitalFormat')}
+                  onChange={handleDropdownChange}
+                />
               </div>
               <div>
-                <label htmlFor="digitalSize" className="block mb-1 text-sm">Size</label>
-                <select
-                  id="digitalSize"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('digitalSize')}
-                >
-                  <option value="leaderboard">Leaderboard (728×90)</option>
-                  <option value="medium">Medium Rectangle (300×250)</option>
-                  <option value="skyscraper">Skyscraper (160×600)</option>
-                  <option value="custom">Custom Size</option>
-                </select>
+                <CustomDropdown
+                  label="Size"
+                  name="digitalSize"
+                  options={digitalSizeOptions}
+                  value={watch('digitalSize')}
+                  onChange={handleDropdownChange}
+                />
               </div>
             </div>
           </div>
@@ -107,31 +136,22 @@ const AdDetails = () => {
             <h3 className="font-medium mb-2">Social Media Options</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="socialPlatform" className="block mb-1 text-sm">Platform</label>
-                <select
-                  id="socialPlatform"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('socialPlatform')}
-                >
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="twitter">Twitter</option>
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="tiktok">TikTok</option>
-                </select>
+                <CustomDropdown
+                  label="Platform"
+                  name="socialPlatform"
+                  options={socialPlatformOptions}
+                  value={watch('socialPlatform')}
+                  onChange={handleDropdownChange}
+                />
               </div>
               <div>
-                <label htmlFor="socialType" className="block mb-1 text-sm">Type</label>
-                <select
-                  id="socialType"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  {...register('socialType')}
-                >
-                  <option value="post">Regular Post</option>
-                  <option value="story">Story</option>
-                  <option value="carousel">Carousel</option>
-                  <option value="video">Video</option>
-                </select>
+                <CustomDropdown
+                  label="Type"
+                  name="socialType"
+                  options={socialTypeOptions}
+                  value={watch('socialType')}
+                  onChange={handleDropdownChange}
+                />
               </div>
             </div>
           </div>
@@ -214,4 +234,4 @@ const AdDetails = () => {
   );
 };
 
-export default AdDetails; 
+export default AdDetails;

@@ -1,8 +1,28 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import CustomDropdown from './CustomDropdown';
 
 const RequesterInfo = () => {
-  const { register, formState: { errors, touchedFields } } = useFormContext();
+  const { register, watch, formState: { errors, touchedFields }, setValue } = useFormContext();
+  
+  // Define options for department dropdown
+  const departmentOptions = [
+    { value: '', label: 'Select a department' },
+    { value: 'Marketing', label: 'Marketing' },
+    { value: 'Sales', label: 'Sales' },
+    { value: 'Product', label: 'Product' },
+    { value: 'Engineering', label: 'Engineering' },
+    { value: 'HR', label: 'Human Resources' },
+    { value: 'Finance', label: 'Finance' },
+    { value: 'Operations', label: 'Operations' },
+    { value: 'Customer Support', label: 'Customer Support' },
+    { value: 'Other', label: 'Other' }
+  ];
+  
+  // Custom handler for dropdown change
+  const handleDropdownChange = (e) => {
+    setValue(e.target.name, e.target.value);
+  };
   
   return (
     <div>
@@ -57,32 +77,15 @@ const RequesterInfo = () => {
         </div>
         
         <div>
-          <label htmlFor="requesterDepartment" className="block mb-1 font-medium">
-            Department <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="requesterDepartment"
-            className={`w-full px-3 py-2 border rounded-md ${
-              errors.requesterDepartment ? 'border-red-500' : 'border-gray-300'
-            }`}
-            {...register('requesterDepartment', { 
-              required: 'Department is required' 
-            })}
-          >
-            <option value="">Select a department</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Sales">Sales</option>
-            <option value="Product">Product</option>
-            <option value="Engineering">Engineering</option>
-            <option value="HR">Human Resources</option>
-            <option value="Finance">Finance</option>
-            <option value="Operations">Operations</option>
-            <option value="Customer Support">Customer Support</option>
-            <option value="Other">Other</option>
-          </select>
-          {errors.requesterDepartment && (
-            <p className="mt-1 text-sm text-red-500">{errors.requesterDepartment.message}</p>
-          )}
+          <CustomDropdown
+            label="Department"
+            name="requesterDepartment"
+            options={departmentOptions}
+            value={watch('requesterDepartment')}
+            onChange={handleDropdownChange}
+            required={true}
+            error={errors.requesterDepartment?.message}
+          />
         </div>
         
         <div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import CustomDropdown from '../components/CustomDropdown';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -15,6 +16,28 @@ const Dashboard = () => {
     startDate: '',
     endDate: ''
   });
+
+  const statusFilterOptions = [
+    { value: '', label: 'All Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'in-review', label: 'In Review' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'completed', label: 'Completed' }
+  ];
+
+  const departmentFilterOptions = [
+    { value: '', label: 'All Departments' },
+    { value: 'Marketing', label: 'Marketing' },
+    { value: 'Sales', label: 'Sales' },
+    { value: 'Product', label: 'Product' },
+    { value: 'Engineering', label: 'Engineering' },
+    { value: 'HR', label: 'Human Resources' },
+    { value: 'Finance', label: 'Finance' },
+    { value: 'Operations', label: 'Operations' },
+    { value: 'Customer Support', label: 'Customer Support' },
+    { value: 'Other', label: 'Other' }
+  ];
 
   // Fetch requests
   const fetchRequests = async () => {
@@ -196,44 +219,24 @@ const Dashboard = () => {
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                 Status
               </label>
-              <select
-                id="status"
+              <CustomDropdown
                 name="status"
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                options={statusFilterOptions}
                 value={filters.status}
                 onChange={handleFilterChange}
-              >
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="in-review">In Review</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="completed">Completed</option>
-              </select>
+              />
             </div>
             
             <div>
               <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
                 Department
               </label>
-              <select
-                id="department"
+              <CustomDropdown
                 name="department"
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
+                options={departmentFilterOptions}
                 value={filters.department}
                 onChange={handleFilterChange}
-              >
-                <option value="">All Departments</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Sales">Sales</option>
-                <option value="Product">Product</option>
-                <option value="Engineering">Engineering</option>
-                <option value="HR">Human Resources</option>
-                <option value="Finance">Finance</option>
-                <option value="Operations">Operations</option>
-                <option value="Customer Support">Customer Support</option>
-                <option value="Other">Other</option>
-              </select>
+              />
             </div>
             
             <div>

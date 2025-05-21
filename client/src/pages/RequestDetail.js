@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import CustomDropdown from '../components/CustomDropdown';
 import axios from 'axios';
 
 const RequestDetail = () => {
@@ -11,6 +12,14 @@ const RequestDetail = () => {
   const [note, setNote] = useState('');
   const [status, setStatus] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
+
+  const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'in-review', label: 'In Review' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'completed', label: 'Completed' }
+  ];
   
   // Fetch request details
   useEffect(() => {
@@ -381,21 +390,13 @@ const RequestDetail = () => {
             <div className="p-6">
               <form onSubmit={handleUpdateRequest}>
                 <div className="mb-4">
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    id="status"
+                  <CustomDropdown
+                    label="Status"
+                    name="status"
+                    options={statusOptions}
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="in-review">In Review</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="completed">Completed</option>
-                  </select>
+                  />
                 </div>
                 
                 <div className="mb-4">
