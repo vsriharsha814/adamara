@@ -18,7 +18,8 @@ const RequestSchema = new Schema({
     required: [true, 'Department is required']
   },
   requesterPhone: {
-    type: String
+    type: String,
+    required: [true, 'Phone number is required']
   },
   
   // Ad Details

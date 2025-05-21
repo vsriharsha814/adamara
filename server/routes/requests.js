@@ -48,6 +48,7 @@ router.post(
     check('requesterName', 'Requester name is required').not().isEmpty(),
     check('requesterEmail', 'Please include a valid email').isEmail(),
     check('requesterDepartment', 'Department is required').not().isEmpty(),
+    check('requesterPhone', 'Phone number is required').not().isEmpty(),
     check('adType', 'Ad type is required').isIn(['print', 'digital', 'social', 'video', 'other']),
     check('adPurpose', 'Ad purpose is required').not().isEmpty(),
     check('desiredCompletionDate', 'Completion date is required').not().isEmpty()

@@ -59,7 +59,7 @@ const Confirmation = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Phone</p>
-              <p>{formValues.requesterPhone || 'Not provided'}</p>
+              <p>{formValues.requesterPhone}</p>
             </div>
           </div>
           

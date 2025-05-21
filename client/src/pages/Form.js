@@ -20,12 +20,12 @@ const Form = () => {
   const navigate = useNavigate();
   
   const methods = useForm({
-    mode: 'onChange',
+    mode: 'onTouched', // Change validation mode to validate on blur instead of onChange
     defaultValues: {
       requesterName: '',
       requesterEmail: '',
       requesterDepartment: '',
-      requesterPhone: '',
+      requesterPhone: '', // This will now be required
       adType: 'digital',
       adPurpose: '',
       targetAudience: '',

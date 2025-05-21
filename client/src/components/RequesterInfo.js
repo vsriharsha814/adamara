@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 const RequesterInfo = () => {
-  const { register, formState: { errors } } = useFormContext();
+  const { register, formState: { errors, touchedFields } } = useFormContext();
   
   return (
     <div>
@@ -43,10 +43,15 @@ const RequesterInfo = () => {
               pattern: {
                 value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                 message: 'Please enter a valid email address'
+              },
+              validate: (value) => {
+                // Only validate email format when the field isn't empty
+                if (value.trim() === '') return true;
+                return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) || 'Please enter a valid email address';
               }
             })}
           />
-          {errors.requesterEmail && (
+          {touchedFields.requesterEmail && errors.requesterEmail && (
             <p className="mt-1 text-sm text-red-500">{errors.requesterEmail.message}</p>
           )}
         </div>
@@ -82,15 +87,26 @@ const RequesterInfo = () => {
         
         <div>
           <label htmlFor="requesterPhone" className="block mb-1 font-medium">
-            Phone Number
+            Phone Number <span className="text-red-500">*</span>
           </label>
           <input
             id="requesterPhone"
             type="tel"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            placeholder="Optional"
-            {...register('requesterPhone')}
+            className={`w-full px-3 py-2 border rounded-md ${
+              errors.requesterPhone ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="e.g., (123) 456-7890"
+            {...register('requesterPhone', {
+              required: 'Phone number is required',
+              pattern: {
+                value: /^[\d\s()+.-]+$/,
+                message: 'Please enter a valid phone number'
+              }
+            })}
           />
+          {errors.requesterPhone && (
+            <p className="mt-1 text-sm text-red-500">{errors.requesterPhone.message}</p>
+          )}
         </div>
       </div>
       
