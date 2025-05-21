@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Safari-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fix for select dropdowns */
+  select {
+    background-position: right 0.5rem center !important;
+    background-size: 1.5em 1.5em !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    padding-right: 2.5rem !important;
+  }
+  
+  /* Fix for input fields */
+  input, textarea {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    border-radius: 0.375rem !important;
+  }
+  
+  /* Fix for mobile form elements */
+  @media (max-width: 640px) {
+    select, input, textarea {
+      font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+  }
+}

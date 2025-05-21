@@ -15,7 +15,7 @@ const Header = () => {
               <span className="text-gray-800 text-2xl font-bold">Amara</span>
             </Link>
             <span className="ml-4 text-sm text-gray-500 hidden sm:inline-block">
-              Ad Request Management System
+              by Amaravati Communications Pvt. Ltd.
             </span>
           </div>
           

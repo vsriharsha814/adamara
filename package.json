@@ -1,7 +1,7 @@
 {
     "name": "adamara",
     "version": "1.0.0",
-    "description": "AdAmara - Ad Request Management System",
+    "description": "AdAmara - by Amaravati Communications Pvt. Ltd.",
     "main": "index.js",
     "scripts": {
       "start": "concurrently \"npm run server\" \"npm run client\"",

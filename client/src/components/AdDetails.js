@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import CustomDropdown from './CustomDropdown';
 
 const AdDetails = () => {
   const { register, watch, formState: { errors } } = useFormContext();
