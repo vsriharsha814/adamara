@@ -57,6 +57,9 @@ adamara/
 ├── client/                  # Frontend React application
 │   ├── public/              # Static files
 │   └── src/                 # Source files
+├── web/                     # New Next.js frontend (Vercel-friendly)
+│   └── src/
+│       └── app/             # App Router routes
 ├── server/                  # Backend Node.js application
 │   ├── controllers/         # Route controllers
 │   ├── models/              # Database models
@@ -74,6 +77,19 @@ adamara/
 
 ## 🚢 Deployment
 
+### Frontend (Next.js on Vercel)
+
+The upgraded UI lives in `web/` and is designed for Vercel.
+
+1. Create a new Vercel project from this repo (or import it)
+2. **Set environment variable**:
+   - `NEXT_PUBLIC_API_BASE_URL` = your backend URL (example: `https://your-backend.example.com`)
+3. Deploy
+
+Notes:
+- The Next.js app calls your backend at `${NEXT_PUBLIC_API_BASE_URL}/api/...`
+- A root `vercel.json` is included so Vercel builds the `web/` app automatically.
+
 ### Backend Deployment
 
 1. Set up a MongoDB Atlas cluster
@@ -85,20 +101,9 @@ heroku create
 git push heroku main
 ```
 
-### Frontend Deployment
+### Legacy Frontend (CRA)
 
-1. Build the client:
-
-```bash
-cd client
-npm run build
-```
-
-2. Deploy to Vercel, Netlify, or similar:
-
-```bash
-npx vercel
-```
+The original React app is still in `client/` (kept for reference during migration). Going forward, use `web/`.
 
 ## 📝 API Documentation
 

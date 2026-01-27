@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 const ContentInfo = () => {
-  const { register, formState: { errors } } = useFormContext();
+  const { register } = useFormContext();
   
   return (
     <div>

@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 
 const FileUpload = ({ files, setFiles }) => {
-  const { formState: { errors } } = useFormContext();
   const [dragActive, setDragActive] = useState(false);
   const [fileError, setFileError] = useState('');
   
@@ -53,7 +51,7 @@ const FileUpload = ({ files, setFiles }) => {
     
     // Add valid files to state
     setFiles([...files, ...validFiles]);
-  }, [files, setFiles]);
+  }, [files, setFiles, MAX_FILE_SIZE, ALLOWED_TYPES]);
   
   // Handle file input change
   const handleChange = (e) => {
