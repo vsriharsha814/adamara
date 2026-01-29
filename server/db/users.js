@@ -83,6 +83,29 @@ async function updateUser(id, patch) {
   return normalizeUser(updated);
 }
 
+async function upsertUserFromFirebase({ uid, email, name }) {
+  const db = getFirestore();
+  const docRef = db.collection(USERS_COLLECTION).doc(uid);
+  const now = admin.firestore.FieldValue.serverTimestamp();
+
+  // Keep existing role/department if present; only set basics.
+  await docRef.set(
+    {
+      name: name || null,
+      email: email ? String(email).toLowerCase().trim() : null,
+      active: true,
+      lastLogin: new Date(),
+      createdAt: now,
+      updatedAt: now
+    },
+    { merge: true }
+  );
+
+  const updated = await docRef.get();
+  if (!updated.exists) return null;
+  return normalizeUser(updated);
+}
+
 async function matchPassword(user, enteredPassword) {
   if (!user?.passwordHash) return false;
   return bcrypt.compare(enteredPassword, user.passwordHash);
@@ -93,5 +116,6 @@ module.exports = {
   getUserByEmail,
   createUser,
   updateUser,
+  upsertUserFromFirebase,
   matchPassword
 };

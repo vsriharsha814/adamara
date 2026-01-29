@@ -3,7 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const multer = require('multer');
 const path = require('path');
-const passport = require('passport');
+const { authenticate } = require('../middleware/auth');
 const {
   createRequest,
   getRequestById,
@@ -123,7 +123,7 @@ router.post(
 // @access  Private
 router.get(
   '/',
-  passport.authenticate('jwt', { session: false }),
+  authenticate,
   async (req, res) => {
     try {
       // Set up pagination
@@ -169,7 +169,7 @@ router.get(
 // @access  Private
 router.get(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  authenticate,
   async (req, res) => {
     try {
       const request = await getRequestById(req.params.id);
@@ -201,7 +201,7 @@ router.get(
 // @access  Private
 router.put(
   '/:id',
-  passport.authenticate('jwt', { session: false }),
+  authenticate,
   async (req, res) => {
     try {
       const request = await getRequestById(req.params.id);
@@ -250,7 +250,7 @@ router.put(
 // @access  Private
 router.get(
   '/export/csv',
-  passport.authenticate('jwt', { session: false }),
+  authenticate,
   async (req, res) => {
     try {
       const { items: requests } = await listRequests({

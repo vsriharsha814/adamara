@@ -1,36 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { firebaseApp } from '../firebase';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
     setError('');
     setIsLoading(true);
     
     try {
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password
-      });
-      
-      // Store token in localStorage
-      localStorage.setItem('authToken', response.data.token);
-      
-      // Redirect to admin dashboard
+      const auth = getAuth(firebaseApp);
+      const provider = new GoogleAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      // Store Firebase ID token; backend expects this as Bearer token
+      localStorage.setItem('authToken', idToken);
+
       navigate('/admin/dashboard');
     } catch (err) {
       console.error('Login error:', err);
       setError(
-        err.response?.data?.errors?.[0]?.msg || 
-        err.response?.data?.message || 
-        'Login failed. Please check your credentials and try again.'
+        err?.message ||
+        'Google sign-in failed. Please try again.'
       );
     } finally {
       setIsLoading(false);
@@ -50,49 +47,18 @@ const Login = () => {
           </div>
         )}
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="mb-6">
-            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div>
-            <button
-              type="submit"
-              className={`w-full px-4 py-2 text-white font-medium rounded-md ${
-                isLoading 
-                  ? 'bg-blue-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-          </div>
-        </form>
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className={`w-full px-4 py-2 text-white font-medium rounded-md ${
+            isLoading 
+              ? 'bg-blue-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Signing in with Google...' : 'Continue with Google'}
+        </button>
       </div>
     </div>
   );

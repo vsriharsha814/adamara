@@ -1,4 +1,6 @@
-const passport = require('passport');
+const { admin } = require('../config/firebase');
+const { getUserById, upsertUserFromFirebase } = require('../db/users');
+const { getRequestById } = require('../db/requests');
 
 /**
  * Middleware to check if user is authenticated
@@ -7,22 +9,48 @@ const passport = require('passport');
  * @param {Function} next - Express next function
  */
 const authenticate = (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    
-    if (!user) {
+  (async () => {
+    try {
+      const authHeader = req.headers.authorization || '';
+      const match = authHeader.match(/^Bearer\s+(.+)$/i);
+      const token = match?.[1];
+
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: 'Missing Authorization header (Bearer token required).'
+        });
+      }
+
+      const decoded = await admin.auth().verifyIdToken(token);
+
+      // Prefer Firestore user profile/role; fall back to claims/basic decoded fields.
+      let user = await getUserById(decoded.uid);
+      if (!user) {
+        user = await upsertUserFromFirebase({
+          uid: decoded.uid,
+          email: decoded.email,
+          name: decoded.name
+        });
+      }
+
+      req.user = {
+        id: decoded.uid,
+        _id: decoded.uid,
+        email: decoded.email || user?.email,
+        name: decoded.name || user?.name,
+        role: user?.role || decoded.role || decoded?.claims?.role,
+        department: user?.department
+      };
+
+      return next();
+    } catch (err) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication failed. Please log in again.'
+        message: 'Invalid or expired Firebase ID token.'
       });
     }
-    
-    // Add user to request object
-    req.user = user;
-    next();
-  })(req, res, next);
+  })();
 };
 
 /**
@@ -58,11 +86,7 @@ const isAdminOrAssigned = async (req, res, next) => {
     // Get request ID from route parameters
     const requestId = req.params.id;
     
-    // Import Request model
-    const Request = require('../models/request');
-    
-    // Find request
-    const request = await Request.findById(requestId);
+    const request = await getRequestById(requestId);
     
     // If request doesn't exist, return 404
     if (!request) {
@@ -73,7 +97,7 @@ const isAdminOrAssigned = async (req, res, next) => {
     }
     
     // Check if user is assigned to this request
-    if (request.assignedTo && request.assignedTo.toString() === req.user.id) {
+    if (request.assignedTo && String(request.assignedTo) === String(req.user.id)) {
       return next();
     }
     

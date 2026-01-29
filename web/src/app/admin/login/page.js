@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { firebaseApp } from "@/lib/firebaseClient";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,20 +12,26 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
     setError("");
     setIsLoading(true);
 
     try {
-      const response = await api.post("/auth/login", { email, password });
-      window.localStorage.setItem("authToken", response.data.token);
+      const auth = getAuth(firebaseApp);
+      const provider = new GoogleAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      // Store Firebase ID token; backend expects this as Bearer token
+      window.localStorage.setItem("authToken", idToken);
+
       router.replace("/admin/dashboard");
     } catch (err) {
+      console.error("Google login error:", err);
       setError(
-        err.response?.data?.errors?.[0]?.msg ||
-          err.response?.data?.message ||
-          "Login failed. Please check your credentials and try again."
+        err?.message ||
+          "Google sign-in failed. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -39,7 +46,7 @@ export default function LoginPage() {
             Admin login
           </h1>
           <p className="mb-6 text-center text-sm text-gray-600 dark:text-slate-300">
-            Sign in to review, update, and export ad requests.
+            Sign in with your Google account to review, update, and export ad requests.
           </p>
 
           {error && (
@@ -48,51 +55,16 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-200"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/15 dark:bg-white/5 dark:text-slate-100"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-200"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-white/15 dark:bg-white/5 dark:text-slate-100"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className={`w-full rounded-md px-4 py-2 font-medium text-white ${
-                isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in…" : "Sign in"}
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className={`flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 font-medium text-white ${
+              isLoading ? "cursor-not-allowed bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in…" : "Continue with Google"}
+          </button>
         </div>
       </div>
     </div>

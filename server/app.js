@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const passport = require('passport');
 
 // Initialize express app
 const app = express();
@@ -30,12 +29,6 @@ app.use(morgan('dev'));
 // Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Initialize passport
-app.use(passport.initialize());
-
-// Import passport config
-require('./config/passport')(passport);
 
 // Import routes
 const requestRoutes = require('./routes/requests');
