@@ -4,7 +4,12 @@ const { check, validationResult } = require('express-validator');
 const multer = require('multer');
 const path = require('path');
 const passport = require('passport');
-const Request = require('../models/request');
+const {
+  createRequest,
+  getRequestById,
+  updateRequest,
+  listRequests
+} = require('../db/requests');
 
 // Set up multer for file uploads (temporary local storage, will be replaced with S3)
 const storage = multer.diskStorage({
@@ -71,7 +76,7 @@ router.post(
       })) : [];
 
       // Create new request
-      const newRequest = new Request({
+      const payload = {
         requesterName: req.body.requesterName,
         requesterEmail: req.body.requesterEmail,
         requesterDepartment: req.body.requesterDepartment,
@@ -91,10 +96,10 @@ router.post(
         
         files: files,
         status: 'pending'
-      });
+      };
 
-      // Save request to database
-      const savedRequest = await newRequest.save();
+      // Save request to Firestore
+      const savedRequest = await createRequest(payload);
 
       // TODO: Send confirmation email to requester
 
@@ -121,54 +126,25 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      // Build filter object from query parameters
-      const filterObj = {};
-      
-      // Filter by status if provided
-      if (req.query.status) {
-        filterObj.status = req.query.status;
-      }
-      
-      // Filter by date range if provided
-      if (req.query.startDate && req.query.endDate) {
-        filterObj.requestDate = {
-          $gte: new Date(req.query.startDate),
-          $lte: new Date(req.query.endDate)
-        };
-      }
-      
-      // Filter by requester name or email if provided
-      if (req.query.search) {
-        filterObj.$or = [
-          { requesterName: { $regex: req.query.search, $options: 'i' } },
-          { requesterEmail: { $regex: req.query.search, $options: 'i' } }
-        ];
-      }
-      
-      // Filter by department if provided
-      if (req.query.department) {
-        filterObj.requesterDepartment = req.query.department;
-      }
-      
       // Set up pagination
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      const skip = (page - 1) * limit;
       
       // Set up sorting
       const sortField = req.query.sortField || 'requestDate';
-      const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
-      const sortObj = {};
-      sortObj[sortField] = sortOrder;
-      
-      // Execute query with pagination and sorting
-      const requests = await Request.find(filterObj)
-        .sort(sortObj)
-        .skip(skip)
-        .limit(limit);
-      
-      // Get total count for pagination
-      const totalCount = await Request.countDocuments(filterObj);
+      const sortOrder = req.query.sortOrder === 'asc' ? 'asc' : 'desc';
+
+      const { items: requests, totalCount } = await listRequests({
+        status: req.query.status,
+        department: req.query.department,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
+        search: req.query.search,
+        page,
+        limit,
+        sortField,
+        sortOrder
+      });
       
       res.json({
         success: true,
@@ -196,9 +172,7 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const request = await Request.findById(req.params.id)
-        .populate('assignedTo', 'name email')
-        .populate('adminNotes.createdBy', 'name email');
+      const request = await getRequestById(req.params.id);
       
       if (!request) {
         return res.status(404).json({
@@ -213,14 +187,6 @@ router.get(
       });
     } catch (err) {
       console.error('Error fetching request:', err);
-      
-      // Check if error is due to invalid ID format
-      if (err.kind === 'ObjectId') {
-        return res.status(404).json({
-          success: false,
-          message: 'Request not found'
-        });
-      }
       
       res.status(500).json({
         success: false,
@@ -238,7 +204,7 @@ router.put(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      const request = await Request.findById(req.params.id);
+      const request = await getRequestById(req.params.id);
       
       if (!request) {
         return res.status(404).json({
@@ -247,28 +213,21 @@ router.put(
         });
       }
       
+      const patch = {};
+
       // Update fields if provided
-      if (req.body.status) {
-        request.status = req.body.status;
-      }
-      
-      if (req.body.assignedTo) {
-        request.assignedTo = req.body.assignedTo;
-      }
-      
+      if (req.body.status) patch.status = req.body.status;
+      if (req.body.assignedTo) patch.assignedTo = req.body.assignedTo; // store userId
+
       // Add admin note if provided
       if (req.body.note) {
-        request.adminNotes.push({
-          note: req.body.note,
-          createdBy: req.user.id
-        });
+        patch.adminNotes = [
+          ...(Array.isArray(request.adminNotes) ? request.adminNotes : []),
+          { note: req.body.note, createdBy: req.user.id, createdAt: new Date() }
+        ];
       }
-      
-      // Update lastUpdated timestamp
-      request.lastUpdated = Date.now();
-      
-      // Save updated request
-      const updatedRequest = await request.save();
+
+      const updatedRequest = await updateRequest(req.params.id, patch);
       
       res.json({
         success: true,
@@ -277,14 +236,6 @@ router.put(
       });
     } catch (err) {
       console.error('Error updating request:', err);
-      
-      // Check if error is due to invalid ID format
-      if (err.kind === 'ObjectId') {
-        return res.status(404).json({
-          success: false,
-          message: 'Request not found'
-        });
-      }
       
       res.status(500).json({
         success: false,
@@ -302,29 +253,16 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
-      // Build filter object from query parameters (same as GET all requests)
-      const filterObj = {};
-      
-      if (req.query.status) {
-        filterObj.status = req.query.status;
-      }
-      
-      if (req.query.startDate && req.query.endDate) {
-        filterObj.requestDate = {
-          $gte: new Date(req.query.startDate),
-          $lte: new Date(req.query.endDate)
-        };
-      }
-      
-      if (req.query.search) {
-        filterObj.$or = [
-          { requesterName: { $regex: req.query.search, $options: 'i' } },
-          { requesterEmail: { $regex: req.query.search, $options: 'i' } }
-        ];
-      }
-      
-      // Get requests without pagination
-      const requests = await Request.find(filterObj).sort({ requestDate: -1 });
+      const { items: requests } = await listRequests({
+        status: req.query.status,
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
+        search: req.query.search,
+        page: 1,
+        limit: 100000, // effectively "all" for small datasets
+        sortField: 'requestDate',
+        sortOrder: 'desc'
+      });
       
       // Set response headers for CSV download
       res.setHeader('Content-Type', 'text/csv');
@@ -335,7 +273,9 @@ router.get(
       
       // Add data rows
       requests.forEach(request => {
-        csv += `${request._id},${request.requesterName},${request.requesterEmail},${request.requesterDepartment},${request.adType},${request.status},${request.requestDate.toISOString()},${request.desiredCompletionDate.toISOString()}\n`;
+        const requestDate = request.requestDate ? request.requestDate.toISOString() : '';
+        const completionDate = request.desiredCompletionDate ? request.desiredCompletionDate.toISOString() : '';
+        csv += `${request._id},${request.requesterName},${request.requesterEmail},${request.requesterDepartment},${request.adType},${request.status},${requestDate},${completionDate}\n`;
       });
       
       // Send CSV response

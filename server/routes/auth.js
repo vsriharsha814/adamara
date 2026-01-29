@@ -3,7 +3,12 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const User = require('../models/user');
+const {
+  getUserByEmail,
+  createUser,
+  updateUser,
+  matchPassword
+} = require('../db/users');
 
 // @route   POST api/auth/register
 // @desc    Register a new admin user
@@ -27,7 +32,7 @@ router.post(
 
     try {
       // Check if user already exists
-      let user = await User.findOne({ email });
+      let user = await getUserByEmail(email);
       
       if (user) {
         return res.status(400).json({ 
@@ -36,16 +41,7 @@ router.post(
       }
 
       // Create new user
-      user = new User({
-        name,
-        email,
-        password,
-        role,
-        department
-      });
-
-      // Save user to database
-      await user.save();
+      user = await createUser({ name, email, password, role, department });
 
       // Create JWT payload
       const payload = {
@@ -92,7 +88,7 @@ router.post(
 
     try {
       // Find user by email
-      const user = await User.findOne({ email }).select('+password');
+      const user = await getUserByEmail(email);
       
       if (!user) {
         return res.status(400).json({ 
@@ -101,7 +97,7 @@ router.post(
       }
 
       // Check if password matches
-      const isMatch = await user.matchPassword(password);
+      const isMatch = await matchPassword(user, password);
       
       if (!isMatch) {
         return res.status(400).json({ 
@@ -110,8 +106,7 @@ router.post(
       }
 
       // Update last login time
-      user.lastLogin = Date.now();
-      await user.save();
+      await updateUser(user.id, { lastLogin: new Date() });
 
       // Create JWT payload
       const payload = {

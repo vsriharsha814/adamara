@@ -1,13 +1,10 @@
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const mongoose = require('mongoose');
 
 // Load environment variables
 require('dotenv').config();
 
-// Import User model - make sure to require this before using it
-// The path should point to your User model file
-const User = require('../models/user');
+const { getUserById } = require('../db/users');
 
 const options = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,7 +16,7 @@ module.exports = passport => {
     new JwtStrategy(options, async (jwt_payload, done) => {
       try {
         // Find the user by id from the JWT payload
-        const user = await User.findById(jwt_payload.id);
+        const user = await getUserById(jwt_payload.id);
         
         if (user) {
           // If user is found, return the user
