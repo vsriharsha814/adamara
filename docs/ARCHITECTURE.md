@@ -24,10 +24,8 @@
 
 ## Repo layout
 
-- **`web/`** — Next.js app (public site + admin). This is the main app.
-- **`server/`** — Optional/deprecated. The app is designed to run **without** the server using Firebase only.
-- **`client/`** — Legacy Create React App; can be retired if you only use `web/`.
-- **`firestore.rules`** / **`storage.rules`** — Deploy with Firebase CLI (`firebase deploy --only firestore` / `firebase deploy --only storage`).
+- **`web/`** — Next.js app (public site + admin). This is the only app.
+- **`firestore.rules`** — Deploy with Firebase CLI (`firebase deploy --only firestore`).
 
 ## Env vars
 

@@ -1,8 +1,8 @@
 # AdAmara - Ad Request Management System
 
-AdAmara is a full-stack application for managing advertising requests, featuring a multi-step form for users to submit requests and an admin dashboard for processing those requests.
+AdAmara is a Next.js application for managing advertising requests, featuring a multi-step form for users to submit requests and an admin dashboard for processing those requests.
 
-**Current setup:** The app runs **without a backend server**. The Next.js app in `web/` uses **Firebase** (Auth + Firestore + Storage). Admin is at **`/admin`** (login at `/admin/login` with Google); it is **not linked** from the home page. See **docs/ARCHITECTURE.md** for details.
+The app runs **without a backend server**. The Next.js app in `web/` uses **Firebase** (Auth + Firestore). Admin is at **`/admin`** (login at `/admin/login` with Google); it is **not linked** from the home page. See **docs/ARCHITECTURE.md** for details.
 
 ## 🚀 Features
 
@@ -40,37 +40,23 @@ Edit the `.env` file with your configuration.
 3. **Install dependencies**
 
 ```bash
-npm run install:all
+npm install
+cd web && npm install
 ```
 
-4. **Start development servers**
+4. **Start the Next.js app**
 
 ```bash
-npm run start
+npm run dev
 ```
-
-This will start both the client (React) and server (Node.js) concurrently.
 
 ## 🗂️ Project Structure
 
 ```
 adamara/
-├── client/                  # Frontend React application
-│   ├── public/              # Static files
-│   └── src/                 # Source files
-├── web/                     # New Next.js frontend (Vercel-friendly)
+├── web/                     # Next.js frontend (Vercel-friendly)
 │   └── src/
 │       └── app/             # App Router routes
-├── server/                  # Backend Node.js application
-│   ├── controllers/         # Route controllers
-│   ├── models/              # Database models
-│   ├── routes/              # API routes
-│   ├── services/            # Business logic
-│   ├── middleware/          # Express middleware
-│   ├── utils/               # Utility functions
-│   ├── config/              # Configuration files
-│   ├── app.js               # Express app setup
-│   └── server.js            # Server entry point
 ├── .gitignore               # Git ignore file
 ├── README.md                # Project documentation
 └── package.json             # Root package.json for scripts
@@ -90,13 +76,7 @@ Notes:
 - No backend URL is required; the app talks to Firebase from the browser.
 - Deploy Firestore and Storage rules: `firebase deploy --only firestore` and `firebase deploy --only storage` (after `firebase init` in the repo).
 
-### Server (optional)
-
-The `server/` folder is **not** required for the current architecture. See `server/README.md` and **docs/ARCHITECTURE.md**.
-
-### Legacy Frontend (CRA)
-
-The original React app is still in `client/` (kept for reference during migration). Going forward, use `web/`.
+The legacy `client/` (CRA) and `server/` (Express) apps have been removed; the project is now a single Next.js app in `web/`.
 
 ## 📝 API Documentation
 

@@ -4,16 +4,10 @@
     "description": "AdAmara - by Amaravati Communications Pvt. Ltd.",
     "main": "index.js",
     "scripts": {
-      "start": "concurrently \"npm run server\" \"npm run client\"",
-      "server": "cd server && npm run dev",
-      "client": "cd client && npm start",
-      "web": "cd web && npm run dev",
-      "install:all": "npm install && npm run install:client && npm run install:server",
-      "install:client": "cd client && npm install",
-      "install:server": "cd server && npm install",
-      "build": "cd client && npm run build",
-      "build:web": "cd web && npm run build",
-      "test": "concurrently \"cd server && npm test\" \"cd client && npm test\""
+      "dev": "cd web && npm run dev",
+      "build": "cd web && npm run build",
+      "start": "cd web && npm run start",
+      "lint": "cd web && npm run lint"
     },
     "keywords": [
       "ad",
@@ -23,8 +17,5 @@
       "mern"
     ],
     "author": "",
-    "license": "ISC",
-    "devDependencies": {
-      "concurrently": "^8.2.2"
-    }
+    "license": "ISC"
 }
