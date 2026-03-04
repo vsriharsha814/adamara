@@ -7,17 +7,16 @@ The app runs **without a backend server**. The Next.js app in `web/` uses **Fire
 ## 🚀 Features
 
 - **Multi-step dynamic form** for submitting ad requests
-- **File upload** support for PDFs and images
+- **Optional reference image uploads** stored inline on the request
 - **Admin dashboard** for managing requests
-- **Email notifications** for request status updates
 - **Responsive design** for mobile and desktop
-- **Secure authentication** for admin users
-- **Data export** capabilities
+- **Secure authentication** for admin users (Google sign‑in via Firebase Auth)
+- **Data export** capabilities (CSV from the admin dashboard)
 
 ## 📋 Prerequisites
 
-- Node.js (v16+)
-- A **Firebase** project (Auth, Firestore, Storage)
+- Node.js (v18+ recommended)
+- A **Firebase** project (Auth + Firestore)
 - npm or yarn
 
 ## 🛠️ Installation
@@ -74,33 +73,4 @@ The app lives in `web/` and is designed for Vercel.
 
 Notes:
 - No backend URL is required; the app talks to Firebase from the browser.
-- Deploy Firestore and Storage rules: `firebase deploy --only firestore` and `firebase deploy --only storage` (after `firebase init` in the repo).
-
-The legacy `client/` (CRA) and `server/` (Express) apps have been removed; the project is now a single Next.js app in `web/`.
-
-## 📝 API Documentation
-
-### Authentication Endpoints
-
-- `POST /api/auth/login` - Login with email/password
-- `POST /api/auth/register` - Register a new admin (restricted)
-- `GET /api/auth/current` - Get current user info
-
-### Request Endpoints
-
-- `POST /api/requests` - Create a new request
-- `GET /api/requests` - Get all requests (with filtering)
-- `GET /api/requests/:id` - Get a single request by ID
-- `PUT /api/requests/:id` - Update a request
-- `GET /api/requests/export/csv` - Export requests as CSV
-
-## 🔒 Security Considerations
-
-- All routes requiring authentication are protected with JWT
-- Input validation is implemented on all endpoints
-- Rate limiting is applied to prevent abuse
-- File uploads are restricted by type and size
-
-## 🧪 Testing
-
-Run tests:
+- Deploy Firestore rules: `firebase deploy --only firestore` (after `firebase init` in the repo).

@@ -1,211 +1,204 @@
-# AdAmara Setup Guide
+# AdAmara Setup Guide (Next.js + Firebase)
 
-This document provides step-by-step instructions to set up and run the AdAmara application - an ad request management system featuring a multi-step form for ad submissions and an admin dashboard for processing requests.
+This guide walks you through setting up and running the **AdAmara** ad request portal using the **Next.js** app in `web/` and **Firebase** (Auth + Firestore).
 
-## Prerequisites
+There is **no separate backend server** and **no legacy React app** – everything runs from the Next.js app.
 
-- Node.js v16 or higher
-- npm or yarn
-- Git (to clone the repository)
-- Internet connection (for downloading dependencies and accessing MongoDB Atlas)
+---
 
-## Step 1: Clone the Repository
+## 1. Prerequisites
+
+- Node.js v18+ (recommended)
+- npm (comes with Node)
+- A Firebase project with:
+  - Firebase Authentication (Google sign‑in)
+  - Cloud Firestore
+
+---
+
+## 2. Clone the repository
 
 ```bash
 git clone <repository-url>
 cd adamara
 ```
 
-## Step 2: Set Up MongoDB Atlas (Cloud Database)
+---
 
-1. **Create a MongoDB Atlas account**:
-   - Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) and register for a free account
-   - Sign in to your account
+## 3. Create a Firebase project and web app
 
-2. **Create a free cluster**:
-   - Click "Build a Database"
-   - Select "FREE" shared cluster option
-   - Choose your preferred cloud provider (AWS, Google Cloud, or Azure) and region
-   - Click "Create Cluster" (this may take a few minutes to provision)
+1. Go to the Firebase console: `https://console.firebase.google.com`
+2. **Create a new project** (or select an existing one).
+3. In **Project settings → General → Your apps**, click **“Add app” → Web** (</>):
+   - Give it a name (e.g. `adamara-web`).
+   - Register the app (you do *not* need to enable hosting here).
+4. Firebase will show a config snippet:
 
-3. **Set up database access**:
-   - In the left sidebar, click "Database Access" under SECURITY
-   - Click "Add New Database User"
-   - Create a username and password (store these securely, you'll need them later)
-   - Set privileges to "Read and write to any database"
-   - Click "Add User"
+```js
+const firebaseConfig = {
+  apiKey: "…",
+  authDomain: "…",
+  projectId: "…",
+  messagingSenderId: "…",
+  appId: "…",
+};
+```
 
-4. **Configure network access**:
-   - In the left sidebar, click "Network Access" under SECURITY
-   - Click "Add IP Address"
-   - For development purposes, you can add your current IP or select "Allow Access from Anywhere" (0.0.0.0/0)
-   - Click "Confirm"
+You will map these values into your `.env` file in the next step.
 
-5. **Get your connection string**:
-   - Go back to Database deployments (click "Database" in the left sidebar)
-   - Click "Connect" on your cluster
-   - Select "Connect your application"
-   - Copy the connection string (it will look like: `mongodb+srv://username:<password>@cluster0.xxxxx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
-   - Replace `<password>` with your database user's password
-   - Replace `myFirstDatabase` with `adamara`
+---
 
-## Step 3: Configure Environment Variables
+## 4. Configure environment variables
 
-1. **Create a .env file in the root directory**:
+From the project root:
 
 ```bash
 cp .env.sample .env
 ```
 
-2. **Edit the .env file with your specific settings**:
-
-```
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# MongoDB Configuration
-MONGODB_URI=mongodb+srv://username:your-password@cluster0.xxxxx.mongodb.net/adamara?retryWrites=true&w=majority
-
-# JWT Authentication
-JWT_SECRET=choose-a-strong-secret-key-here
-JWT_EXPIRE=1d
-
-# Email Configuration (optional for development)
-# EMAIL_HOST=smtp.example.com
-# EMAIL_PORT=587
-# EMAIL_SECURE=false
-# EMAIL_USER=your_email_username
-# EMAIL_PASSWORD=your_email_password
-# EMAIL_FROM=noreply@adamara.example.com
-
-# File Upload (using local storage for development)
-# No need to configure AWS/cloud storage for development
-```
-
-## Step 4: Create Upload Directory
-
-Create a directory for file uploads in the server folder:
+Open `.env` and fill in the **Next.js** Firebase variables:
 
 ```bash
-mkdir -p server/uploads
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
 ```
 
-## Step 5: Install Dependencies
+Use the values from the `firebaseConfig` snippet:
 
-Install all dependencies for both server and client:
+- `apiKey` → `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `authDomain` → `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `projectId` → `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `messagingSenderId` → `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `appId` → `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+---
+
+## 5. Enable Firebase products
+
+In your Firebase project:
+
+### 5.1 Authentication (Google sign‑in for admin)
+
+1. Go to **Build → Authentication → Get started**.
+2. Under the **Sign‑in method** tab:
+   - Enable **Google**.
+   - Configure the authorized domains if prompted (make sure `localhost` and your production domain are included).
+
+### 5.2 Cloud Firestore
+
+1. Go to **Build → Firestore Database**.
+2. Click **Create database**.
+3. Choose a region and **Start in production mode** (recommended) or test mode for local development.
+4. After creation, you can deploy rules later with the Firebase CLI (see below).
+
+> The app uses Firestore collections to store ad requests; no additional schema setup is required.
+
+---
+
+## 6. Install dependencies
+
+From the project root:
 
 ```bash
-npm run install:all
-```
-
-If the above command fails, you can install dependencies separately:
-
-```bash
-# Install root dependencies
 npm install
-
-# Install client dependencies
-cd client
+cd web
 npm install
-cd ..
-
-# Install server dependencies
-cd server
-npm install
-cd ..
 ```
 
-## Step 6: Start the Application
+This installs root tooling plus all Next.js app dependencies.
 
-Start both the client and server concurrently:
+---
+
+## 7. Run the app locally
+
+From the project root:
 
 ```bash
-npm start
+npm run dev
 ```
 
-This will start:
-- The React frontend at http://localhost:3000
-- The Node.js backend at http://localhost:5000
+This runs the Next.js app in `web/` with hot reload.
 
-## Step 7: Create an Admin User
+- Public site and request form: `http://localhost:3000`
+- Admin login: `http://localhost:3000/admin/login`
 
-To access the admin dashboard, you need to create an admin user. You can do this using a tool like [Postman](https://www.postman.com/downloads/) or cURL:
+> Admin login uses Firebase Google Auth. Any Google account that successfully signs in will be able to see the admin UI; you can tighten this later with custom claims / allowlists in Firestore rules.
 
-Using cURL:
+---
 
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Admin User","email":"admin@example.com","password":"your-secure-password","role":"admin"}'
-```
+## 8. Firestore security rules (recommended)
 
-Using Postman:
-1. Create a new POST request to `http://localhost:5000/api/auth/register`
-2. Set Content-Type header to `application/json`
-3. Set request body to:
-```json
-{
-  "name": "Admin User",
-  "email": "admin@example.com",
-  "password": "your-secure-password",
-  "role": "admin"
+To properly secure requests, you should deploy Firestore rules that:
+
+- Allow **anyone** to create a new request (for the public form).
+- Allow **only authenticated admins** to read/update requests.
+
+A simple pattern is:
+
+```txt
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /requests/{requestId} {
+      allow create: if true;                 // public can submit
+      allow read, update, delete: if request.auth != null; // restrict to signed-in users
+    }
+  }
 }
 ```
-4. Send the request
 
-This will return a JWT token, but you don't need to save it since you'll login through the UI.
+> This is an example, not a full rule set. Adjust to your org’s requirements before deploying.
 
-## Step 8: Access the Application
+To deploy rules you’ll need the Firebase CLI:
 
-1. **Access the public form**:
-   - Open your browser and go to: http://localhost:3000/request
-   - This is where users can submit ad requests
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init firestore   # choose this repo and your project
+firebase deploy --only firestore
+```
 
-2. **Access the admin dashboard**:
-   - Go to: http://localhost:3000/admin/login
-   - Login with the admin email and password you created in Step 7
-   - Once logged in, you can view and manage ad requests
+---
 
-## Troubleshooting
+## 9. Image uploads
 
-### Connection to MongoDB fails
+The current app allows users to upload a **small number of compressed images** as references:
 
-- Verify your MongoDB Atlas connection string in the .env file
-- Check if your IP address is allowed in the Network Access settings in MongoDB Atlas
-- Ensure you've replaced `<password>` with your actual database user password
+- Images are stored **directly on the request document** in Firestore (as small data URLs with metadata).
+- Limits are enforced in the UI (file type, size, and count) to keep documents within Firestore size constraints.
 
-### File uploads don't work
+You don’t need to configure Firebase Storage for this version.
 
-- Ensure the `server/uploads` directory exists and is writable
-- For large files, check if they exceed the 10MB limit defined in the application
+---
 
-### Port conflicts
+## 10. Production deployment (Vercel)
 
-- If port 3000 or 5000 is already in use, you can modify the ports:
-  - For the client: Edit `PORT=3001` in `client/.env`
-  - For the server: Edit `PORT=5001` in the root `.env` file
+The app is designed to be deployed as a standard Next.js app.
 
-### Admin registration fails
+1. Push your repo to GitHub / GitLab.
+2. In Vercel:
+   - Import the repo.
+   - Set the **Root Directory** to the project root (Vercel will detect `web/`).
+   - In **Environment Variables**, add:
+     - `NEXT_PUBLIC_FIREBASE_API_KEY`
+     - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+     - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+     - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+     - `NEXT_PUBLIC_FIREBASE_APP_ID`
+3. Deploy.
 
-- Ensure your MongoDB connection is working
-- Check the server logs for specific error messages
-- Verify that you're including all required fields in the registration request
+> After deployment, visit `[your-domain]/admin/login` to access the admin area with Google sign‑in.
 
-## Production Deployment Considerations
+---
 
-For development purposes, the setup above is sufficient. When you're ready to deploy to production:
+## 11. Quick recap
 
-1. **Set NODE_ENV to production** in your .env file
-2. **Configure proper email settings** for notifications
-3. **Set up secure JWT secret keys**
-4. **Consider setting up cloud storage** (AWS S3 or Google Cloud Storage) for file uploads
-5. **Deploy the frontend** to a service like Vercel or Netlify
-6. **Deploy the backend** to a service like Render, Railway, or a VPS
+- **Code you run:** only the Next.js app in `web/`.
+- **State:** stored in Firestore (`requests` collection) with optional inline image data.
+- **Auth:** handled by Firebase Authentication (Google provider).
+- **Local dev:** `npm run dev` (after `.env` and Firebase project setup).
+- **Prod:** Deploy `web/` as a Next.js app (Vercel recommended) and configure the same Firebase env vars.
 
-## Additional Information
-
-- The client runs on React (port 3000 by default)
-- The server runs on Node.js/Express (port 5000 by default)
-- Files are stored locally in development mode in the `server/uploads` directory
-- MongoDB Atlas free tier is sufficient for development and small-scale production use

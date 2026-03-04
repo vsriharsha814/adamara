@@ -65,42 +65,68 @@ export default function RequestPage() {
       reader.readAsDataURL(file);
     });
 
+  const withTimeout = (promise, ms) =>
+    new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            "Submitting the request is taking longer than expected. Please check your connection and try again."
+          )
+        );
+      }, ms);
+
+      promise
+        .then((result) => {
+          clearTimeout(timeoutId);
+          resolve(result);
+        })
+        .catch((error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+    });
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
-      let images = [];
-      if (files.length > 0) {
-        images = await Promise.all(
-          files.map(async (file) => ({
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            dataUrl: await fileToDataUrl(file),
-          }))
-        );
-      }
+      await withTimeout(
+        (async () => {
+          let images = [];
+          if (files.length > 0) {
+            images = await Promise.all(
+              files.map(async (file) => ({
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                dataUrl: await fileToDataUrl(file),
+              }))
+            );
+          }
 
-      const payload = {
-        requesterName: data.requesterName,
-        requesterEmail: data.requesterEmail,
-        requesterDepartment: data.requesterDepartment,
-        requesterPhone: data.requesterPhone,
-        adType: data.adType,
-        adPurpose: data.adPurpose,
-        targetAudience: data.targetAudience || null,
-        desiredPlacement: data.desiredPlacement || null,
-        budget: data.budget ? Number(data.budget) : null,
-        desiredCompletionDate: data.desiredCompletionDate || null,
-        adTitle: data.adTitle || null,
-        adDescription: data.adDescription || null,
-        specialInstructions: data.specialInstructions || null,
-        images,
-      };
-      const id = await createRequest(payload);
-      setRequestId(id);
-      setStep(steps.length - 1);
+          const payload = {
+            requesterName: data.requesterName,
+            requesterEmail: data.requesterEmail,
+            requesterDepartment: data.requesterDepartment,
+            requesterPhone: data.requesterPhone,
+            adType: data.adType,
+            adPurpose: data.adPurpose,
+            targetAudience: data.targetAudience || null,
+            desiredPlacement: data.desiredPlacement || null,
+            budget: data.budget ? Number(data.budget) : null,
+            desiredCompletionDate: data.desiredCompletionDate || null,
+            adTitle: data.adTitle || null,
+            adDescription: data.adDescription || null,
+            specialInstructions: data.specialInstructions || null,
+            images,
+          };
+          const id = await createRequest(payload);
+          setRequestId(id);
+          setStep(steps.length - 1);
+        })(),
+        20000
+      );
     } catch (error) {
       setSubmitError(
         error?.message || "There was a problem submitting your request. Please try again."
