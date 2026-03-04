@@ -17,6 +17,8 @@ export default function LoginPage() {
     setPendingMessage("");
     setIsLoading(true);
     let signedInUid = null;
+    let signedInEmail = null;
+    let signedInDisplayName = null;
 
     try {
       const auth = getAuthSafe();
@@ -28,6 +30,8 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       const { uid, email, displayName } = result.user;
       signedInUid = uid;
+      signedInEmail = email || null;
+      signedInDisplayName = displayName || null;
 
       const allowed = await isAllowedAdmin(uid);
       if (allowed) {
@@ -37,8 +41,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Not allowed: record login request and show pending message
-      await submitLoginRequest({ uid, email: email || null, displayName: displayName || null });
+      // Not allowed: record login request (so admin can approve) then show pending message
+      await submitLoginRequest({ uid, email: signedInEmail, displayName: signedInDisplayName });
       await signOut(auth);
       if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
       setPendingMessage(
@@ -50,14 +54,24 @@ export default function LoginPage() {
         err?.code === "permission-denied" ||
         err?.message?.toLowerCase?.().includes("permission");
       if (isPermissionError && signedInUid) {
-        setPendingMessage(
-          "Your request to access the admin area has been submitted. An existing admin must approve you before you can sign in. Please contact your admin or use the contact details on the main site."
-        );
+        // Still add them to login_requests so you can approve (user is still signed in until we signOut)
+        try {
+          await submitLoginRequest({
+            uid: signedInUid,
+            email: signedInEmail,
+            displayName: signedInDisplayName,
+          });
+        } catch (e) {
+          console.error("Could not record login request:", e);
+        }
         try {
           const auth = getAuthSafe();
           if (auth) await signOut(auth);
           if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
         } catch (_) {}
+        setPendingMessage(
+          "Your request to access the admin area has been submitted. An existing admin must approve you before you can sign in. Please contact your admin or use the contact details on the main site."
+        );
       } else if (!isPermissionError) {
         setError(
           err?.message ||

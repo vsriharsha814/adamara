@@ -25,11 +25,14 @@ function firestore() {
   return db;
 }
 
-/** Convert Firestore doc to plain object with id and date fields */
+const REQUESTS_PLACEHOLDER_ID = "_init";
+
+/** Convert Firestore doc to plain object with id and date fields. Returns null for placeholder doc. */
 function docToRequest(docSnap) {
   if (!docSnap?.exists?.()) return null;
   const d = docSnap.data();
   const id = docSnap.id;
+  if (id === REQUESTS_PLACEHOLDER_ID || d._placeholder) return null;
   const toDate = (v) => (v?.toDate ? v.toDate() : v);
   return {
     _id: id,
@@ -79,9 +82,25 @@ export async function createRequest(payload) {
 
 /** Get a single request by id */
 export async function getRequestById(id) {
+  if (id === REQUESTS_PLACEHOLDER_ID) return null;
   const db = firestore();
   const snap = await getDoc(doc(db, REQUESTS, id));
   return docToRequest(snap);
+}
+
+/** Ensure the requests collection exists in Firestore (so it appears in Console). Called once when admin lists. */
+let _requestsCollectionEnsured = false;
+async function ensureRequestsCollectionExists() {
+  if (_requestsCollectionEnsured) return;
+  const db = firestore();
+  const snap = await getDocs(query(collection(db, REQUESTS), limit(1)));
+  if (snap.empty) {
+    await setDoc(doc(db, REQUESTS, REQUESTS_PLACEHOLDER_ID), {
+      _placeholder: true,
+      _createdAt: serverTimestamp(),
+    });
+  }
+  _requestsCollectionEnsured = true;
 }
 
 /** List requests with filters and pagination (filters applied in memory to avoid composite indexes) */
@@ -96,6 +115,7 @@ export async function listRequests({
   sortField = "requestDate",
   sortOrder = "desc",
 }) {
+  await ensureRequestsCollectionExists();
   const db = firestore();
   const q = query(
     collection(db, REQUESTS),
@@ -103,7 +123,10 @@ export async function listRequests({
     limit(Math.min(2000, Math.max(50, pageSize * (page + 2))))
   );
   const snapshot = await getDocs(q);
-  let items = snapshot.docs.map((d) => docToRequest(d));
+  let items = snapshot.docs
+    .filter((d) => d.id !== REQUESTS_PLACEHOLDER_ID && !d.data()._placeholder)
+    .map((d) => docToRequest(d))
+    .filter(Boolean);
 
   if (status) items = items.filter((r) => r.status === status);
   if (department) items = items.filter((r) => r.requesterDepartment === department);
