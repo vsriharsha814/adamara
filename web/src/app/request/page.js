@@ -219,9 +219,9 @@ export default function RequestPage() {
                   {step === steps.length - 2 && (
                     <button
                       type="submit"
-                      disabled={isSubmitting || !methods.formState.isValid}
+                      disabled={isSubmitting}
                       className={`rounded-md px-4 py-2 font-medium ${
-                        isSubmitting || !methods.formState.isValid
+                        isSubmitting
                           ? "cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-white/10 dark:text-slate-400"
                           : "bg-green-600 text-white hover:bg-green-700"
                       }`}
