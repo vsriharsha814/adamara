@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { clearAuthToken } from "@/lib/api";
+import { signOut } from "firebase/auth";
+import { getAuthSafe } from "@/lib/firebaseClient";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SiteHeader() {
@@ -44,12 +45,6 @@ export default function SiteHeader() {
               >
                 Contact
               </Link>
-              <Link
-                href="/admin/login"
-                className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-white/10"
-              >
-                Admin Login
-              </Link>
             </>
           )}
 
@@ -64,8 +59,14 @@ export default function SiteHeader() {
               <button
                 type="button"
                 className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-white/10"
-                onClick={() => {
-                  clearAuthToken();
+                onClick={async () => {
+                  const auth = getAuthSafe();
+                  if (auth) {
+                    await signOut(auth);
+                  }
+                  if (typeof window !== "undefined") {
+                    window.localStorage.removeItem("authToken");
+                  }
                   router.replace("/admin/login");
                 }}
               >
