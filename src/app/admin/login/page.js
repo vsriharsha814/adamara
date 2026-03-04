@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [pendingMessage, setPendingMessage] = useState("");
-  const [pendingUid, setPendingUid] = useState("");
   const router = useRouter();
 
   const handleGoogleLogin = async () => {
@@ -42,7 +41,6 @@ export default function LoginPage() {
       await submitLoginRequest({ uid, email: email || null, displayName: displayName || null });
       await signOut(auth);
       if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
-      setPendingUid(uid);
       setPendingMessage(
         "Your request to access the admin area has been submitted. An existing admin must approve you before you can sign in. Please contact your admin or use the contact details on the main site."
       );
@@ -52,7 +50,6 @@ export default function LoginPage() {
         err?.code === "permission-denied" ||
         err?.message?.toLowerCase?.().includes("permission");
       if (isPermissionError && signedInUid) {
-        setPendingUid(signedInUid);
         setPendingMessage(
           "Your request to access the admin area has been submitted. An existing admin must approve you before you can sign in. Please contact your admin or use the contact details on the main site."
         );
@@ -86,18 +83,12 @@ export default function LoginPage() {
               <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100">
                 {pendingMessage}
               </div>
-              {pendingUid && (
-                <p className="mb-4 rounded border border-amber-300 bg-amber-100/50 p-3 font-mono text-xs text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/20 dark:text-amber-100">
-                  Setting up the first admin? In Firebase Console → Firestore, create a document in
-                  collection <strong>allowed_admins</strong> with document ID: <strong>{pendingUid}</strong>. Then sign in again.
-                </p>
-              )}
               <p className="text-center text-sm text-gray-600 dark:text-slate-400">
                 You can try signing in again after an admin has approved your access.
               </p>
               <button
                 type="button"
-                onClick={() => { setPendingMessage(""); setPendingUid(""); }}
+                onClick={() => setPendingMessage("")}
                 className="mt-6 w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
               >
                 Back to sign in
