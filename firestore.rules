@@ -13,13 +13,19 @@ service cloud.firestore {
       allow read, update, delete: if isAllowedAdmin();
     }
 
-    // Allowed admins: doc id = Firebase UID. Only that user can read their own; only existing admins can create (for new admins).
-    // First admin must be created manually in Firebase Console (allowed_admins/<uid> with field email or empty).
+    // Helper: true if login_requests doc for uid has makeAdmin == true
+    function loginRequestMakeAdmin(uid) {
+      return exists(/databases/$(database)/documents/login_requests/$(uid))
+        && get(/databases/$(database)/documents/login_requests/$(uid)).data.get('makeAdmin', false) == true;
+    }
+
+    // Allowed admins: user can read own; existing admins can create for others; user can create own if login_requests has makeAdmin true.
     match /allowed_admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null
-        && request.auth.uid != uid
-        && isAllowedAdmin();
+      allow create: if request.auth != null && (
+        (request.auth.uid != uid && isAllowedAdmin())
+        || (request.auth.uid == uid && loginRequestMakeAdmin(uid))
+      );
       allow update, delete: if request.auth != null
         && request.auth.uid != uid
         && isAllowedAdmin();

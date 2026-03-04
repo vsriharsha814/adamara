@@ -191,7 +191,7 @@ function DashboardInner() {
             Pending access requests
           </h2>
           <p className="mb-3 text-sm text-amber-800 dark:text-amber-100/80">
-            Check <strong>Make admin</strong> to create an admin (a Cloud Function will add them to allowed_admins). Or use <strong>Approve</strong> to do it immediately. You can also set <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-500/20">makeAdmin: true</code> on the doc in Firestore Console.
+            Check <strong>Make admin</strong> to set the flag; when they sign in again they get admin access. Or use <strong>Approve</strong> to add them immediately. You can also set <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-500/20">makeAdmin: true</code> on the doc in Firestore Console.
           </p>
           {pendingLoginsLoading ? (
             <p className="text-sm text-amber-700 dark:text-amber-200/80">Loading…</p>

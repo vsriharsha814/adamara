@@ -263,11 +263,26 @@ export async function approveAdmin({ uid, email, displayName }) {
   if (snap.exists()) await deleteDoc(loginRef);
 }
 
-/** Set makeAdmin: true on a login request. Cloud Function will create allowed_admin and delete the request. */
+/** Set makeAdmin: true on a login request. When the user signs in again, they will be created as admin. */
 export async function setLoginRequestMakeAdmin(uid) {
   const db = firestore();
   await updateDoc(doc(db, LOGIN_REQUESTS, uid), {
     makeAdmin: true,
     updatedAt: serverTimestamp(),
   });
+}
+
+/** If login_requests doc has makeAdmin true, create allowed_admins and delete login_request. Call after sign-in when not yet allowed. Returns true if admin was created. */
+export async function createAdminIfMakeAdmin({ uid, email, displayName }) {
+  const db = firestore();
+  const loginSnap = await getDoc(doc(db, LOGIN_REQUESTS, uid));
+  if (!loginSnap.exists() || loginSnap.data().makeAdmin !== true) return false;
+  await setDoc(doc(db, ALLOWED_ADMINS, uid), {
+    email: email ?? null,
+    displayName: displayName ?? null,
+    approvedAt: serverTimestamp(),
+    approvedVia: "makeAdmin",
+  });
+  await deleteDoc(doc(db, LOGIN_REQUESTS, uid));
+  return true;
 }

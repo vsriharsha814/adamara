@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { getAuthSafe } from "@/lib/firebaseClient";
-import { isAllowedAdmin, submitLoginRequest } from "@/lib/firestore";
+import { isAllowedAdmin, submitLoginRequest, createAdminIfMakeAdmin } from "@/lib/firestore";
 
 export default function LoginPage() {
   const [error, setError] = useState("");
@@ -33,7 +33,15 @@ export default function LoginPage() {
       signedInEmail = email || null;
       signedInDisplayName = displayName || null;
 
-      const allowed = await isAllowedAdmin(uid);
+      let allowed = await isAllowedAdmin(uid);
+      if (!allowed) {
+        const created = await createAdminIfMakeAdmin({
+          uid,
+          email: signedInEmail,
+          displayName: signedInDisplayName,
+        });
+        if (created) allowed = true;
+      }
       if (allowed) {
         const idToken = await result.user.getIdToken();
         if (typeof window !== "undefined") window.localStorage.setItem("authToken", idToken);
@@ -41,7 +49,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Not allowed: record login request (so admin can approve) then show pending message
+      // Not allowed: record login request (so admin can set makeAdmin) then show pending message
       await submitLoginRequest({ uid, email: signedInEmail, displayName: signedInDisplayName });
       await signOut(auth);
       if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
