@@ -44,7 +44,7 @@ export default function RequestPage() {
       { name: "Ad details", component: <AdDetails /> },
       { name: "Timeline", component: <Timeline /> },
       { name: "Content", component: <ContentInfo /> },
-      { name: "Images", component: <FileUpload files={files} setFiles={setFiles} /> },
+      { name: "Images (optional)", component: <FileUpload files={files} setFiles={setFiles} /> },
       { name: "Done", component: <Confirmation /> },
     ],
     [files]

@@ -16,6 +16,8 @@ const RequesterInfo = () => {
     { value: 'Finance', label: 'Finance' },
     { value: 'Operations', label: 'Operations' },
     { value: 'Customer Support', label: 'Customer Support' },
+    { value: 'Personal Ad', label: 'Personal Ad' },
+    { value: 'Obituary', label: 'Obituary' },
     { value: 'Other', label: 'Other' }
   ];
   

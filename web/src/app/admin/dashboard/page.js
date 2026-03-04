@@ -197,6 +197,8 @@ function DashboardInner() {
                 <option value="Finance">Finance</option>
                 <option value="Operations">Operations</option>
                 <option value="Customer Support">Customer Support</option>
+                <option value="Personal Ad">Personal Ad</option>
+                <option value="Obituary">Obituary</option>
                 <option value="Other">Other</option>
               </select>
             </div>

@@ -115,9 +115,10 @@ export default function FileUpload({ files, setFiles }) {
 
   return (
     <div>
-      <h2 className="mb-1 text-xl font-semibold">Images</h2>
+      <h2 className="mb-1 text-xl font-semibold">Images (optional)</h2>
       <p className="mb-5 text-sm text-gray-600">
-        Upload reference images (logos, layouts, mocks). JPEG/PNG only.
+        If you have reference images (logos, layouts, mocks), you can upload them here. JPEG/PNG only.
+        You can skip this step if you don&apos;t have any images right now.
       </p>
 
       <div className="space-y-4">
