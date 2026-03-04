@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 items-center gap-10 py-10 lg:grid-cols-2 lg:py-16">
-        <div>
+      <div className="grid grid-cols-1 items-stretch gap-10 py-10 lg:grid-cols-2 lg:py-16">
+        <div className="flex flex-col justify-center">
           <p className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">
             Simple, guided ad requests
           </p>
@@ -54,9 +54,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="relative h-full">
           <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-blue-200/50 via-indigo-200/40 to-cyan-200/40 blur-2xl dark:from-blue-500/20 dark:via-indigo-500/15 dark:to-cyan-500/15" />
-          <div className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
+          <div className="flex h-full flex-col justify-between rounded-2xl border border-black/5 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
             <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">
               What you’ll submit
             </p>
