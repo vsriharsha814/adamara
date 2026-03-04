@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { api, authHeaders } from "@/lib/api";
+import { listRequests, listAllRequests } from "@/lib/firestore";
 
 function DashboardInner() {
   const [requests, setRequests] = useState([]);
@@ -24,22 +24,17 @@ function DashboardInner() {
     setError("");
 
     try {
-      const params = new URLSearchParams();
-      params.append("page", currentPage);
-      params.append("limit", 10);
-
-      if (filters.status) params.append("status", filters.status);
-      if (filters.search) params.append("search", filters.search);
-      if (filters.department) params.append("department", filters.department);
-      if (filters.startDate) params.append("startDate", filters.startDate);
-      if (filters.endDate) params.append("endDate", filters.endDate);
-
-      const response = await api.get(`/requests?${params.toString()}`, {
-        headers: authHeaders(),
+      const result = await listRequests({
+        page: currentPage,
+        pageSize: 10,
+        status: filters.status || undefined,
+        search: filters.search || undefined,
+        department: filters.department || undefined,
+        startDate: filters.startDate || undefined,
+        endDate: filters.endDate || undefined,
       });
-
-      setRequests(response.data.requests || []);
-      setTotalPages(response.data.totalPages || 1);
+      setRequests(result.items || []);
+      setTotalPages(result.totalPages || 1);
     } catch (err) {
       setError("Failed to load requests. Please try again.");
     } finally {
@@ -99,25 +94,27 @@ function DashboardInner() {
 
   const exportToCsv = async () => {
     try {
-      const params = new URLSearchParams();
-      if (filters.status) params.append("status", filters.status);
-      if (filters.search) params.append("search", filters.search);
-      if (filters.department) params.append("department", filters.department);
-      if (filters.startDate) params.append("startDate", filters.startDate);
-      if (filters.endDate) params.append("endDate", filters.endDate);
-
-      const response = await api.get(`/requests/export/csv?${params.toString()}`, {
-        headers: authHeaders(),
-        responseType: "blob",
+      const items = await listAllRequests({
+        status: filters.status || undefined,
+        search: filters.search || undefined,
+        department: filters.department || undefined,
+        startDate: filters.startDate || undefined,
+        endDate: filters.endDate || undefined,
       });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const header = "ID,Requester Name,Email,Department,Ad Type,Status,Request Date,Completion Date\n";
+      const rows = items.map((r) => {
+        const reqDate = r.requestDate ? new Date(r.requestDate).toISOString() : "";
+        const compDate = r.desiredCompletionDate ? new Date(r.desiredCompletionDate).toISOString() : "";
+        return `${r._id},${r.requesterName},${r.requesterEmail},${r.requesterDepartment},${r.adType},${r.status},${reqDate},${compDate}`;
+      });
+      const csv = header + rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `ad-requests-${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
-
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
     } catch {

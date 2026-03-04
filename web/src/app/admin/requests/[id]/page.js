@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 
 import RequireAuth from "@/components/RequireAuth";
 import CustomDropdown from "@/components/CustomDropdown";
-import { api, authHeaders } from "@/lib/api";
+import { getRequestById, updateRequest } from "@/lib/firestore";
+import { getAuthSafe } from "@/lib/firebaseClient";
 
 function RequestDetailInner() {
   const params = useParams();
@@ -37,11 +38,11 @@ function RequestDetailInner() {
       setError("");
 
       try {
-        const response = await api.get(`/requests/${id}`, { headers: authHeaders() });
-        setRequest(response.data.request);
-        setStatus(response.data.request.status);
+        const data = await getRequestById(id);
+        setRequest(data);
+        setStatus(data?.status ?? "");
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load request details. Please try again.");
+        setError(err?.message || "Failed to load request details. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -56,16 +57,22 @@ function RequestDetailInner() {
     setError("");
 
     try {
-      const updateData = { status };
-      if (note.trim()) updateData.note = note;
-
-      const response = await api.put(`/requests/${id}`, updateData, { headers: authHeaders() });
-      setRequest(response.data.request);
+      const patch = { status };
+      if (note.trim()) {
+        const auth = getAuthSafe();
+        const uid = auth?.currentUser?.uid ?? "unknown";
+        patch.adminNotes = [
+          ...(request?.adminNotes || []),
+          { note: note.trim(), createdBy: uid, createdAt: new Date() },
+        ];
+      }
+      const updated = await updateRequest(id, patch);
+      setRequest(updated);
       setNote("");
       // eslint-disable-next-line no-alert
       alert("Request updated successfully");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update request. Please try again.");
+      setError(err?.message || "Failed to update request. Please try again.");
     } finally {
       setUpdateLoading(false);
     }

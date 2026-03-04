@@ -2,6 +2,8 @@
 
 AdAmara is a full-stack application for managing advertising requests, featuring a multi-step form for users to submit requests and an admin dashboard for processing those requests.
 
+**Current setup:** The app runs **without a backend server**. The Next.js app in `web/` uses **Firebase** (Auth + Firestore + Storage). Admin is at **`/admin`** (login at `/admin/login` with Google); it is **not linked** from the home page. See **docs/ARCHITECTURE.md** for details.
+
 ## 🚀 Features
 
 - **Multi-step dynamic form** for submitting ad requests
@@ -15,9 +17,8 @@ AdAmara is a full-stack application for managing advertising requests, featuring
 ## 📋 Prerequisites
 
 - Node.js (v16+)
-- MongoDB (local or Atlas)
+- A **Firebase** project (Auth, Firestore, Storage)
 - npm or yarn
-- AWS S3 bucket (for production)
 
 ## 🛠️ Installation
 
@@ -79,27 +80,19 @@ adamara/
 
 ### Frontend (Next.js on Vercel)
 
-The upgraded UI lives in `web/` and is designed for Vercel.
+The app lives in `web/` and is designed for Vercel.
 
-1. Create a new Vercel project from this repo (or import it)
-2. **Set environment variable**:
-   - `NEXT_PUBLIC_API_BASE_URL` = your backend URL (example: `https://your-backend.example.com`)
-3. Deploy
+1. Create a new Vercel project from this repo (or import it).
+2. **Set environment variables** (see `.env.sample`): all `NEXT_PUBLIC_FIREBASE_*` keys from your Firebase project.
+3. Deploy.
 
 Notes:
-- The Next.js app calls your backend at `${NEXT_PUBLIC_API_BASE_URL}/api/...`
-- A root `vercel.json` is included so Vercel builds the `web/` app automatically.
+- No backend URL is required; the app talks to Firebase from the browser.
+- Deploy Firestore and Storage rules: `firebase deploy --only firestore` and `firebase deploy --only storage` (after `firebase init` in the repo).
 
-### Backend Deployment
+### Server (optional)
 
-1. Set up a MongoDB Atlas cluster
-2. Configure AWS S3 for file storage
-3. Deploy to Heroku, Render, or your preferred hosting:
-
-```bash
-heroku create
-git push heroku main
-```
+The `server/` folder is **not** required for the current architecture. See `server/README.md` and **docs/ARCHITECTURE.md**.
 
 ### Legacy Frontend (CRA)
 

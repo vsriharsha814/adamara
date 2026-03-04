@@ -10,7 +10,7 @@ import Timeline from "@/components/Timeline";
 import ContentInfo from "@/components/ContentInfo";
 import FileUpload from "@/components/FileUpload";
 import Confirmation from "@/components/Confirmation";
-import { api } from "@/lib/api";
+import { createRequest } from "@/lib/firestore";
 
 export default function RequestPage() {
   const [step, setStep] = useState(0);
@@ -62,20 +62,27 @@ export default function RequestPage() {
     setSubmitError("");
 
     try {
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
-      files.forEach((file) => formData.append("files", file));
-
-      const response = await api.post("/requests", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      setRequestId(response.data.requestId);
+      const payload = {
+        requesterName: data.requesterName,
+        requesterEmail: data.requesterEmail,
+        requesterDepartment: data.requesterDepartment,
+        requesterPhone: data.requesterPhone,
+        adType: data.adType,
+        adPurpose: data.adPurpose,
+        targetAudience: data.targetAudience || null,
+        desiredPlacement: data.desiredPlacement || null,
+        budget: data.budget ? Number(data.budget) : null,
+        desiredCompletionDate: data.desiredCompletionDate || null,
+        adTitle: data.adTitle || null,
+        adDescription: data.adDescription || null,
+        specialInstructions: data.specialInstructions || null,
+      };
+      const id = await createRequest(payload, files);
+      setRequestId(id);
       setStep(steps.length - 1);
     } catch (error) {
       setSubmitError(
-        error.response?.data?.message ||
-          "There was a problem submitting your request. Please try again."
+        error?.message || "There was a problem submitting your request. Please try again."
       );
     } finally {
       setIsSubmitting(false);

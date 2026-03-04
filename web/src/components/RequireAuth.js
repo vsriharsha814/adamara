@@ -2,40 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, authHeaders, clearAuthToken, getAuthToken } from "@/lib/api";
+import { onAuthStateChanged } from "firebase/auth";
+import { getAuthSafe } from "@/lib/firebaseClient";
 
 export default function RequireAuth({ children }) {
   const router = useRouter();
   const [status, setStatus] = useState("checking"); // checking | authed | unauthed
 
   useEffect(() => {
-    let mounted = true;
-
-    async function check() {
-      const token = getAuthToken();
-      if (!token) {
-        if (!mounted) return;
-        setStatus("unauthed");
-        router.replace("/admin/login");
-        return;
-      }
-
-      try {
-        await api.get("/auth/current", { headers: authHeaders() });
-        if (!mounted) return;
-        setStatus("authed");
-      } catch {
-        clearAuthToken();
-        if (!mounted) return;
-        setStatus("unauthed");
-        router.replace("/admin/login");
-      }
+    const auth = getAuthSafe();
+    if (!auth) {
+      setStatus("unauthed");
+      router.replace("/admin/login");
+      return;
     }
 
-    check();
-    return () => {
-      mounted = false;
-    };
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        user.getIdToken().then((token) => {
+          if (typeof window !== "undefined") window.localStorage.setItem("authToken", token);
+        });
+        setStatus("authed");
+      } else {
+        if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
+        setStatus("unauthed");
+        router.replace("/admin/login");
+      }
+    });
+
+    return () => unsubscribe();
   }, [router]);
 
   if (status !== "authed") {
@@ -51,4 +46,3 @@ export default function RequireAuth({ children }) {
 
   return children;
 }
-

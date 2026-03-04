@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { firebaseApp } from "@/lib/firebaseClient";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuthSafe } from "@/lib/firebaseClient";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -17,15 +15,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const auth = getAuth(firebaseApp);
+      const auth = getAuthSafe();
+      if (!auth) {
+        setError("Firebase is not available. Check your configuration.");
+        return;
+      }
       const provider = new GoogleAuthProvider();
-
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken();
-
-      // Store Firebase ID token; backend expects this as Bearer token
-      window.localStorage.setItem("authToken", idToken);
-
+      if (typeof window !== "undefined") window.localStorage.setItem("authToken", idToken);
       router.replace("/admin/dashboard");
     } catch (err) {
       console.error("Google login error:", err);

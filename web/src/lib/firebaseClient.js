@@ -1,4 +1,9 @@
+"use client";
+
 import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -9,6 +14,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Avoid re-initializing in Next.js dev / hot reload
-export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+// Only init on client; avoid re-initializing in Next dev / hot reload
+function getAppSafe() {
+  if (typeof window === "undefined") return null;
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
+}
 
+export const firebaseApp = typeof window !== "undefined" ? getAppSafe() : null;
+
+export function getAuthSafe() {
+  return firebaseApp ? getAuth(firebaseApp) : null;
+}
+
+export function getFirestoreSafe() {
+  return firebaseApp ? getFirestore(firebaseApp) : null;
+}
+
+export function getStorageSafe() {
+  return firebaseApp ? getStorage(firebaseApp) : null;
+}
