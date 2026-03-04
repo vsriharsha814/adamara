@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import Link from "next/link";
 
@@ -19,24 +19,60 @@ export default function RequestPage() {
   const [submitError, setSubmitError] = useState("");
   const [requestId, setRequestId] = useState(null);
 
+  const defaultValues = {
+    requesterName: "",
+    requesterEmail: "",
+    requesterDepartment: "",
+    requesterPhone: "",
+    adType: "digital",
+    adPurpose: "",
+    targetAudience: "",
+    desiredPlacement: "",
+    budget: "",
+    desiredCompletionDate: "",
+    adTitle: "",
+    adDescription: "",
+    specialInstructions: "",
+  };
+
   const methods = useForm({
     mode: "onTouched",
-    defaultValues: {
-      requesterName: "",
-      requesterEmail: "",
-      requesterDepartment: "",
-      requesterPhone: "",
-      adType: "digital",
-      adPurpose: "",
-      targetAudience: "",
-      desiredPlacement: "",
-      budget: "",
-      desiredCompletionDate: "",
-      adTitle: "",
-      adDescription: "",
-      specialInstructions: "",
-    },
+    defaultValues,
   });
+
+  // Restore saved form state on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem("adamara_request_form_v1");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        methods.reset({ ...defaultValues, ...parsed });
+      }
+      const savedStep = window.localStorage.getItem("adamara_request_step");
+      if (savedStep !== null) {
+        const parsedStep = Number(savedStep);
+        if (!Number.isNaN(parsedStep) && parsedStep >= 0 && parsedStep <= 4) {
+          setStep(parsedStep);
+        }
+      }
+    } catch {
+      // ignore parse / access errors and fall back to defaults
+    }
+  }, [methods]);
+
+  // Persist form state as the user types
+  useEffect(() => {
+    const subscription = methods.watch((value) => {
+      if (typeof window === "undefined") return;
+      try {
+        window.localStorage.setItem("adamara_request_form_v1", JSON.stringify(value));
+      } catch {
+        // ignore quota / access errors
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [methods]);
 
   const steps = useMemo(
     () => [
@@ -56,6 +92,16 @@ export default function RequestPage() {
   const prevStep = () => {
     if (step > 0) setStep(step - 1);
   };
+
+  // Persist current step so refreshing doesn't lose progress
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("adamara_request_step", String(step));
+    } catch {
+      // ignore storage errors
+    }
+  }, [step]);
 
   const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -141,6 +187,10 @@ export default function RequestPage() {
     setFiles([]);
     setStep(0);
     setRequestId(null);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("adamara_request_form_v1");
+      window.localStorage.removeItem("adamara_request_step");
+    }
   };
 
   const progress = (step / (steps.length - 1)) * 100;
