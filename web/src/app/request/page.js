@@ -136,7 +136,7 @@ export default function RequestPage() {
     setIsSubmitting(true);
     setSubmitError("");
 
-    try {
+    const submitWithTimeout = (async () => {
       let images = [];
       if (files.length > 0) {
         images = await Promise.all(
@@ -166,7 +166,11 @@ export default function RequestPage() {
         images,
       };
 
-      const id = await withTimeout(createRequest(payload), 20000);
+      return await createRequest(payload);
+    })();
+
+    try {
+      const id = await withTimeout(submitWithTimeout, 20000);
       setRequestId(id);
       setStep(steps.length - 1);
     } catch (error) {
