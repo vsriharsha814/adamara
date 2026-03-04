@@ -243,6 +243,7 @@ export async function listLoginRequests() {
       uid: data.uid,
       email: data.email,
       displayName: data.displayName,
+      makeAdmin: data.makeAdmin === true,
       requestedAt: data.requestedAt?.toDate?.()?.toISOString?.() ?? data.requestedAt,
       updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() ?? data.updatedAt,
     };
@@ -260,4 +261,13 @@ export async function approveAdmin({ uid, email, displayName }) {
   const loginRef = doc(db, LOGIN_REQUESTS, uid);
   const snap = await getDoc(loginRef);
   if (snap.exists()) await deleteDoc(loginRef);
+}
+
+/** Set makeAdmin: true on a login request. Cloud Function will create allowed_admin and delete the request. */
+export async function setLoginRequestMakeAdmin(uid) {
+  const db = firestore();
+  await updateDoc(doc(db, LOGIN_REQUESTS, uid), {
+    makeAdmin: true,
+    updatedAt: serverTimestamp(),
+  });
 }

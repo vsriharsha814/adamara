@@ -25,10 +25,10 @@ service cloud.firestore {
         && isAllowedAdmin();
     }
 
-    // Login requests: unapproved users submit here. Requester can create/update/read own doc; admins can read, update (e.g. set makeAdmin), and delete.
+    // Login requests: requester can create/update/read own; admins can read, update (e.g. set makeAdmin), and delete.
     match /login_requests/{requestId} {
-      allow create, update: if request.auth != null && request.auth.uid == requestId;
-      allow read, update: if isAllowedAdmin();
+      allow create: if request.auth != null && request.auth.uid == requestId;
+      allow update, read: if request.auth != null && (request.auth.uid == requestId || isAllowedAdmin());
       allow delete: if isAllowedAdmin();
     }
   }

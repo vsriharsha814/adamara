@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { listRequests, listAllRequests, listLoginRequests, approveAdmin } from "@/lib/firestore";
+import { listRequests, listAllRequests, listLoginRequests, approveAdmin, setLoginRequestMakeAdmin } from "@/lib/firestore";
 
 function DashboardInner() {
   const [requests, setRequests] = useState([]);
@@ -12,6 +12,7 @@ function DashboardInner() {
   const [pendingLogins, setPendingLogins] = useState([]);
   const [pendingLoginsLoading, setPendingLoginsLoading] = useState(true);
   const [approvingUid, setApprovingUid] = useState(null);
+  const [makingAdminUid, setMakingAdminUid] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
@@ -153,6 +154,20 @@ function DashboardInner() {
     }
   };
 
+  const handleMakeAdmin = async (item) => {
+    if (item.makeAdmin) return;
+    setMakingAdminUid(item.uid);
+    try {
+      await setLoginRequestMakeAdmin(item.uid);
+      await new Promise((r) => setTimeout(r, 1500));
+      await fetchPendingLogins();
+    } catch (err) {
+      console.error("Make admin failed:", err);
+    } finally {
+      setMakingAdminUid(null);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
@@ -176,7 +191,7 @@ function DashboardInner() {
             Pending access requests
           </h2>
           <p className="mb-3 text-sm text-amber-800 dark:text-amber-100/80">
-            These people have requested admin access. Approve them to allow sign-in.
+            Check <strong>Make admin</strong> to create an admin (a Cloud Function will add them to allowed_admins). Or use <strong>Approve</strong> to do it immediately. You can also set <code className="rounded bg-amber-200/50 px-1 dark:bg-amber-500/20">makeAdmin: true</code> on the doc in Firestore Console.
           </p>
           {pendingLoginsLoading ? (
             <p className="text-sm text-amber-700 dark:text-amber-200/80">Loading…</p>
@@ -193,14 +208,26 @@ function DashboardInner() {
                       <span className="text-gray-600 dark:text-slate-400"> ({item.email})</span>
                     )}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => handleApprove(item)}
-                    disabled={approvingUid === item.uid}
-                    className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
-                  >
-                    {approvingUid === item.uid ? "Approving…" : "Approve"}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-1.5 text-sm text-gray-700 dark:text-slate-200">
+                      <input
+                        type="checkbox"
+                        checked={item.makeAdmin}
+                        onChange={() => handleMakeAdmin(item)}
+                        disabled={makingAdminUid === item.uid || item.makeAdmin}
+                        className="rounded border-gray-300"
+                      />
+                      Make admin
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => handleApprove(item)}
+                      disabled={approvingUid === item.uid}
+                      className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                    >
+                      {approvingUid === item.uid ? "Approving…" : "Approve"}
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

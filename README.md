@@ -12,4 +12,5 @@ npm install
 npm run dev
 ```
 
-Deploy Firestore rules from project root: `firebase deploy --only firestore`.
+Deploy Firestore rules: `firebase deploy --only firestore`.  
+To allow creating admins by setting `makeAdmin: true` on a login request (in the app or in Firestore Console), deploy Cloud Functions: `cd functions && npm install && cd .. && firebase deploy --only functions`.
