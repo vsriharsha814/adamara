@@ -25,11 +25,11 @@ service cloud.firestore {
         && isAllowedAdmin();
     }
 
-    // Login requests: unapproved users submit here. Only allowed admins can read/delete; requester can create/update own.
+    // Login requests: unapproved users submit here. Requester can create/update/read own doc; admins can read all and delete.
     match /login_requests/{requestId} {
-      allow create: if request.auth != null && request.auth.uid == requestId;
-      allow update: if request.auth != null && request.auth.uid == requestId;
-      allow read, delete: if isAllowedAdmin();
+      allow create, update: if request.auth != null && request.auth.uid == requestId;
+      allow read: if isAllowedAdmin() || (request.auth != null && request.auth.uid == requestId);
+      allow delete: if isAllowedAdmin();
     }
   }
 }

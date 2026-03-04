@@ -17,6 +17,7 @@ export default function LoginPage() {
     setError("");
     setPendingMessage("");
     setIsLoading(true);
+    let signedInUid = null;
 
     try {
       const auth = getAuthSafe();
@@ -27,6 +28,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const { uid, email, displayName } = result.user;
+      signedInUid = uid;
 
       const allowed = await isAllowedAdmin(uid);
       if (allowed) {
@@ -46,10 +48,27 @@ export default function LoginPage() {
       );
     } catch (err) {
       console.error("Google login error:", err);
-      setError(
-        err?.message ||
-          "Google sign-in failed. Please try again."
-      );
+      const isPermissionError =
+        err?.code === "permission-denied" ||
+        err?.message?.toLowerCase?.().includes("permission");
+      if (isPermissionError && signedInUid) {
+        setPendingUid(signedInUid);
+        setPendingMessage(
+          "Your request to access the admin area has been submitted. An existing admin must approve you before you can sign in. Please contact your admin or use the contact details on the main site."
+        );
+        try {
+          const auth = getAuthSafe();
+          if (auth) await signOut(auth);
+          if (typeof window !== "undefined") window.localStorage.removeItem("authToken");
+        } catch (_) {}
+      } else if (!isPermissionError) {
+        setError(
+          err?.message ||
+            "Google sign-in failed. Please try again."
+        );
+      } else {
+        setError("Access requires admin approval. Please contact your admin.");
+      }
     } finally {
       setIsLoading(false);
     }
