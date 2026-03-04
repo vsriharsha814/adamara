@@ -222,7 +222,10 @@ function RequestDetailInner() {
               {request.budget && (
                 <div className="border-t border-gray-200 pt-4 dark:border-white/10">
                   <p className="text-sm text-gray-500 dark:text-slate-300">Budget</p>
-                  <p className="mt-1 text-gray-900 dark:text-slate-100">${request.budget}</p>
+                  <p className="mt-1 text-gray-900 dark:text-slate-100">
+                    ₹
+                    {new Intl.NumberFormat("en-IN").format(Number(request.budget))}
+                  </p>
                 </div>
               )}
             </div>

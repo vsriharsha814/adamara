@@ -209,13 +209,13 @@ const AdDetails = () => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <span className="text-gray-500">$</span>
+              <span className="text-gray-500">₹</span>
             </div>
             <input
               id="budget"
               type="number"
               className="w-full pl-7 px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Estimated budget (optional)"
+              placeholder="Estimated budget in INR (optional)"
               {...register('budget', {
                 valueAsNumber: true,
                 min: {

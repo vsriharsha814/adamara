@@ -203,13 +203,13 @@ export default function AdDetails() {
           </label>
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <span className="text-gray-500">$</span>
+              <span className="text-gray-500">₹</span>
             </div>
             <input
               id="budget"
               type="number"
               className="w-full rounded-md border border-gray-300 px-3 py-2 pl-7"
-              placeholder="Estimated budget (optional)"
+              placeholder="Estimated budget in INR (optional)"
               {...register("budget", {
                 valueAsNumber: true,
                 min: { value: 0, message: "Budget cannot be negative" },

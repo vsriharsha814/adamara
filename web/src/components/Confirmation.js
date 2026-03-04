@@ -16,6 +16,13 @@ export default function Confirmation() {
     }).format(date);
   };
 
+  const formatCurrency = (value) => {
+    if (value === null || value === undefined || value === "") return "";
+    const num = Number(value);
+    if (Number.isNaN(num)) return value;
+    return new Intl.NumberFormat("en-IN").format(num);
+  };
+
   return (
     <div>
       <h2 className="mb-4 text-xl font-semibold">Request submitted successfully</h2>
@@ -81,7 +88,7 @@ export default function Confirmation() {
             {formValues.budget && (
               <div>
                 <p className="text-sm text-gray-500">Budget</p>
-                <p>${formValues.budget}</p>
+                <p>₹{formatCurrency(formValues.budget)}</p>
               </div>
             )}
           </div>
