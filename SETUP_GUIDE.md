@@ -1,8 +1,8 @@
 # AdAmara Setup Guide (Next.js + Firebase)
 
-This guide walks you through setting up and running the **AdAmara** ad request portal using the **Next.js** app in `web/` and **Firebase** (Auth + Firestore).
+This guide walks you through setting up and running the **AdAmara** ad request portal using the **Next.js** app and **Firebase** (Auth + Firestore).
 
-There is **no separate backend server** and **no legacy React app** – everything runs from the Next.js app.
+There is **no separate backend server** – everything runs from this Next.js app at the project root.
 
 ---
 
@@ -104,11 +104,9 @@ From the project root:
 
 ```bash
 npm install
-cd web
-npm install
 ```
 
-This installs root tooling plus all Next.js app dependencies.
+This installs all Next.js app dependencies.
 
 ---
 
@@ -120,7 +118,7 @@ From the project root:
 npm run dev
 ```
 
-This runs the Next.js app in `web/` with hot reload.
+This runs the Next.js app with hot reload.
 
 - Public site and request form: `http://localhost:3000`
 - Admin login: `http://localhost:3000/admin/login`
@@ -181,7 +179,7 @@ The app is designed to be deployed as a standard Next.js app.
 1. Push your repo to GitHub / GitLab.
 2. In Vercel:
    - Import the repo.
-   - Set the **Root Directory** to the project root (Vercel will detect `web/`).
+   - Leave **Root Directory** empty (or set to `.`) so the app at the repo root is used.
    - In **Environment Variables**, add:
      - `NEXT_PUBLIC_FIREBASE_API_KEY`
      - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
@@ -196,9 +194,9 @@ The app is designed to be deployed as a standard Next.js app.
 
 ## 11. Quick recap
 
-- **Code you run:** only the Next.js app in `web/`.
+- **Code you run:** the Next.js app at the project root.
 - **State:** stored in Firestore (`requests` collection) with optional inline image data.
 - **Auth:** handled by Firebase Authentication (Google provider).
 - **Local dev:** `npm run dev` (after `.env` and Firebase project setup).
-- **Prod:** Deploy `web/` as a Next.js app (Vercel recommended) and configure the same Firebase env vars.
+- **Prod:** Deploy the repo as a Next.js app (Vercel recommended) and configure the same Firebase env vars.
 

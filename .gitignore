@@ -6,6 +6,10 @@ node_modules/
 # testing
 coverage/
 
+# Next.js
+.next/
+out/
+
 # production
 build/
 dist/
@@ -23,6 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 logs/
 *.log
+
+# vercel
+.vercel
 
 # ide specific files
 .idea/
@@ -43,5 +50,5 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Uploads directory (for development)
-uploads/
+# misc
+*.pem

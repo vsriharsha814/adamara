@@ -2,7 +2,7 @@
 
 AdAmara is a Next.js application for managing advertising requests, featuring a multi-step form for users to submit requests and an admin dashboard for processing those requests.
 
-The app runs **without a backend server**. The Next.js app in `web/` uses **Firebase** (Auth + Firestore). Admin is at **`/admin`** (login at `/admin/login` with Google); it is **not linked** from the home page.
+The app runs **without a backend server**. This Next.js app uses **Firebase** (Auth + Firestore). Admin is at **`/admin`** (login at `/admin/login` with Google); it is **not linked** from the home page.
 
 ## 🚀 Features
 

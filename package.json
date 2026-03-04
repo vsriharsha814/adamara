@@ -1,21 +1,26 @@
 {
-    "name": "adamara",
-    "version": "1.0.0",
-    "description": "AdAmara - by Amaravati Communications Pvt. Ltd.",
-    "main": "index.js",
-    "scripts": {
-      "dev": "cd web && npm run dev",
-      "build": "cd web && npm run build",
-      "start": "cd web && npm run start",
-      "lint": "cd web && npm run lint"
-    },
-    "keywords": [
-      "ad",
-      "request",
-      "form",
-      "dashboard",
-      "mern"
-    ],
-    "author": "",
-    "license": "ISC"
+  "name": "adamara",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AdAmara - by Amaravati Communications Pvt. Ltd.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "axios": "^1.13.3",
+    "firebase": "^11.0.0",
+    "next": "16.1.5",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.5",
+    "tailwindcss": "^4"
+  }
 }
