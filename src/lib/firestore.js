@@ -210,18 +210,17 @@ export async function isAllowedAdmin(uid) {
   return snap.exists();
 }
 
-/** Submit or update a login request (for unapproved users). Doc id = uid. */
+/** Submit or update a login request (for unapproved users). Doc id = uid. Uses only create/update (no read) so it works without read permission. */
 export async function submitLoginRequest({ uid, email, displayName }) {
   const db = firestore();
   const ref = doc(db, LOGIN_REQUESTS, uid);
-  const existing = await getDoc(ref);
   await setDoc(
     ref,
     {
       uid,
       email: email || null,
       displayName: displayName || null,
-      requestedAt: existing?.exists?.() ? existing.data().requestedAt : serverTimestamp(),
+      requestedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
     { merge: true }
