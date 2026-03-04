@@ -44,9 +44,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-950">
+        <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-950 dark:to-slate-950">
           <SiteHeader />
-          <main className="py-8">{children}</main>
+          <main className="flex flex-1 flex-col py-8">{children}</main>
           <SiteFooter />
         </div>
       </body>
