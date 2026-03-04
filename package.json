@@ -10,16 +10,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "and": "^0.0.3",
     "axios": "^1.13.3",
-    "build": "^0.1.4",
     "firebase": "^11.0.0",
     "next": "16.1.5",
-    "npm": "^11.11.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-hook-form": "^7.71.1",
-    "run": "^1.5.0"
+    "react-hook-form": "^7.71.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
