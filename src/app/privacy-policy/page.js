@@ -16,9 +16,9 @@ export default function PrivacyPolicyPage() {
             1. Who we are
           </h2>
           <p>
-            This privacy policy explains how <strong>AdAmara</strong> (the ad request portal operated
-            by <strong>Amaravati Communications Pvt. Ltd.</strong>, &quot;we&quot; or &quot;us&quot;)
-            collects, uses, and protects personal information when you use this site.
+            This privacy policy explains how <strong>Amaravati Communications Pvt. Ltd.</strong>
+            (&quot;we&quot; or &quot;us&quot;) collects, uses, and protects personal information when you use
+            our ad request portal, AdAmara—whether for personal or business use.
           </p>
         </section>
 
@@ -173,7 +173,7 @@ export default function PrivacyPolicyPage() {
             9. Children&apos;s privacy
           </h2>
           <p>
-            This portal is intended for use by adults in connection with organizational ad requests
+            This portal is intended for use by adults (for personal or business ad requests)
             and is not directed to children. We do not knowingly collect personal information from
             children.
           </p>

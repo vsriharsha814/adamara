@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "AdAmara",
-  description: "Ad request portal for Amaravati Communications Pvt. Ltd.",
+  description: "Ad request portal for individuals and businesses. Amaravati Communications helps you submit and track ad requests.",
   icons: {
     icon: "/icon.png",
     apple: "/icon.png",

@@ -12,7 +12,7 @@ export default function RequesterInfo() {
   } = useFormContext();
 
   const departmentOptions = [
-    { value: "", label: "Select a department" },
+    { value: "", label: "Select department or affiliation" },
     { value: "Marketing", label: "Marketing" },
     { value: "Sales", label: "Sales" },
     { value: "Product", label: "Product" },
@@ -91,7 +91,7 @@ export default function RequesterInfo() {
 
         <div>
           <CustomDropdown
-            label="Department"
+            label="Department or affiliation"
             name="requesterDepartment"
             options={departmentOptions}
             value={watch("requesterDepartment")}

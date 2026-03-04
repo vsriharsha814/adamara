@@ -12,9 +12,9 @@ export default function Home() {
             A clearer way to request ads that actually ship.
           </h1>
           <p className="mt-4 text-lg leading-7 text-gray-600 dark:text-slate-300">
-            AdAmara helps teams submit complete ad requests with the right
-            details, timelines, and files — so the creative process stays fast
-            and organized.
+            Amaravati Communications helps you submit complete ad requests with
+            the right details, timelines, and files — whether for personal use or
+            your business. The creative process stays fast and organized.
           </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -28,7 +28,7 @@ export default function Home() {
               href="/contact"
               className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-white/10"
             >
-              Contact the Team
+              Contact us
             </Link>
           </div>
 
@@ -36,7 +36,7 @@ export default function Home() {
             <div className="rounded-lg border border-black/5 bg-white p-4 dark:border-white/10 dark:bg-white/5">
               <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">Guided steps</p>
               <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
-                Clear sections so users don’t miss details.
+                Clear sections so you don’t miss details.
               </p>
             </div>
             <div className="rounded-lg border border-black/5 bg-white p-4 dark:border-white/10 dark:bg-white/5">
@@ -68,7 +68,7 @@ export default function Home() {
                 <div>
                   <p className="font-medium text-gray-900 dark:text-slate-100">Requester info</p>
                   <p className="text-gray-600 dark:text-slate-300">
-                    Name, email, department, phone.
+                    Name, email, department or affiliation, phone.
                   </p>
                 </div>
               </div>

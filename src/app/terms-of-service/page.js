@@ -16,9 +16,9 @@ export default function TermsOfServicePage() {
             1. Agreement to terms
           </h2>
           <p>
-            By accessing or using the AdAmara ad request portal (the &quot;Service&quot;), you agree
-            to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these
-            Terms, you may not use the Service.
+            By accessing or using the Amaravati Communications ad request portal, AdAmara (the
+            &quot;Service&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do
+            not agree to these Terms, you may not use the Service.
           </p>
         </section>
 
@@ -29,8 +29,8 @@ export default function TermsOfServicePage() {
           <p>
             The Service is operated by <strong>Amaravati Communications Pvt. Ltd.</strong> and is
             designed to collect and manage requests for advertising and communications work. The
-            Service is intended for authorized users (such as employees, partners, or departments)
-            submitting or reviewing ad requests within or on behalf of the organization.
+            Service is for everyone—whether you are an individual requesting ads for personal use,
+            or you are submitting or reviewing ad requests on behalf of a business or department.
           </p>
         </section>
 
@@ -39,8 +39,8 @@ export default function TermsOfServicePage() {
             3. Eligibility and accounts
           </h2>
           <p className="mb-2">
-            To use the Service, you must be an authorized user and, where applicable, have a valid
-            account (for example, for admin access). You agree to:
+            To use the Service, you must provide accurate information when submitting requests and,
+            where applicable, have a valid account (for example, for admin access). You agree to:
           </p>
           <ul className="ml-5 list-disc space-y-1">
             <li>Provide accurate and up-to-date information when submitting ad requests.</li>

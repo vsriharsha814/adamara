@@ -71,7 +71,7 @@ export default function AdDetails() {
     <div>
       <h2 className="mb-1 text-xl font-semibold">Ad details</h2>
       <p className="mb-5 text-sm text-gray-600">
-        Give the team a clear target so design and review are faster.
+        A clear target helps us with design and review, so your request moves faster.
       </p>
 
       <div className="space-y-4">
