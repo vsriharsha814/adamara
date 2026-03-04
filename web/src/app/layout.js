@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "AdAmara",
   description: "Ad request portal for Amaravati Communications Pvt. Ltd.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
