@@ -1,14 +1,35 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Ad requests: anyone can create (public form); only signed-in users can read/update/delete (admin)
+    // Helper: true if the current user is an allowed admin
+    function isAllowedAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/allowed_admins/$(request.auth.uid));
+    }
+
+    // Ad requests: anyone can create (public form); only allowed admins can read/update/delete
     match /requests/{requestId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAllowedAdmin();
     }
-    // Optional: admin allowlist; uncomment and maintain document IDs = Firebase UIDs if you want to restrict admin
-    // match /admins/{uid} {
-    //   allow read: if request.auth != null && request.auth.uid == uid;
-    // }
+
+    // Allowed admins: doc id = Firebase UID. Only that user can read their own; only existing admins can create (for new admins).
+    // First admin must be created manually in Firebase Console (allowed_admins/<uid> with field email or empty).
+    match /allowed_admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null
+        && request.auth.uid != uid
+        && isAllowedAdmin();
+      allow update, delete: if request.auth != null
+        && request.auth.uid != uid
+        && isAllowedAdmin();
+    }
+
+    // Login requests: unapproved users submit here. Only allowed admins can read/delete; requester can create/update own.
+    match /login_requests/{requestId} {
+      allow create: if request.auth != null && request.auth.uid == requestId;
+      allow update: if request.auth != null && request.auth.uid == requestId;
+      allow read, delete: if isAllowedAdmin();
+    }
   }
 }

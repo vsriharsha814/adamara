@@ -3,12 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { listRequests, listAllRequests } from "@/lib/firestore";
+import { listRequests, listAllRequests, listLoginRequests, approveAdmin } from "@/lib/firestore";
 
 function DashboardInner() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pendingLogins, setPendingLogins] = useState([]);
+  const [pendingLoginsLoading, setPendingLoginsLoading] = useState(true);
+  const [approvingUid, setApprovingUid] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
@@ -122,9 +125,41 @@ function DashboardInner() {
     }
   };
 
+  const fetchPendingLogins = useCallback(async () => {
+    setPendingLoginsLoading(true);
+    try {
+      const list = await listLoginRequests();
+      setPendingLogins(list);
+    } catch {
+      setPendingLogins([]);
+    } finally {
+      setPendingLoginsLoading(false);
+    }
+  }, []);
+
+  const handleApprove = async (item) => {
+    setApprovingUid(item.uid);
+    try {
+      await approveAdmin({
+        uid: item.uid,
+        email: item.email,
+        displayName: item.displayName,
+      });
+      await fetchPendingLogins();
+    } catch (err) {
+      console.error("Approve failed:", err);
+    } finally {
+      setApprovingUid(null);
+    }
+  };
+
   useEffect(() => {
     fetchRequests();
   }, [fetchRequests]);
+
+  useEffect(() => {
+    fetchPendingLogins();
+  }, [fetchPendingLogins]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -134,6 +169,44 @@ function DashboardInner() {
           Review, update status, and export results.
         </p>
       </div>
+
+      {pendingLogins.length > 0 && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-400/30 dark:bg-amber-500/10">
+          <h2 className="mb-3 text-lg font-medium text-amber-900 dark:text-amber-200">
+            Pending access requests
+          </h2>
+          <p className="mb-3 text-sm text-amber-800 dark:text-amber-100/80">
+            These people have requested admin access. Approve them to allow sign-in.
+          </p>
+          {pendingLoginsLoading ? (
+            <p className="text-sm text-amber-700 dark:text-amber-200/80">Loading…</p>
+          ) : (
+            <ul className="space-y-2">
+              {pendingLogins.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-white/60 py-2 px-3 dark:bg-black/20"
+                >
+                  <span className="text-sm text-gray-900 dark:text-slate-100">
+                    {item.displayName || item.email || item.uid}
+                    {item.email && item.displayName !== item.email && (
+                      <span className="text-gray-600 dark:text-slate-400"> ({item.email})</span>
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleApprove(item)}
+                    disabled={approvingUid === item.uid}
+                    className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                  >
+                    {approvingUid === item.uid ? "Approving…" : "Approve"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <div className="mb-6 rounded-lg bg-white p-4 shadow-sm ring-1 ring-black/5 dark:bg-white/5 dark:ring-white/10">
         <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-slate-100">Filters</h2>

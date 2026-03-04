@@ -7,6 +7,7 @@ import {
   getDocs,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   orderBy,
   limit,
@@ -15,6 +16,8 @@ import {
 import { getFirestoreSafe } from "@/lib/firebaseClient";
 
 const REQUESTS = "requests";
+const ALLOWED_ADMINS = "allowed_admins";
+const LOGIN_REQUESTS = "login_requests";
 
 function firestore() {
   const db = getFirestoreSafe();
@@ -172,4 +175,67 @@ export async function updateRequest(id, patch) {
   await updateDoc(docRef, update);
   const snap = await getDoc(docRef);
   return docToRequest(snap);
+}
+
+// --- Admin allowlist (login approval) ---
+
+/** Check if the current user's UID is in allowed_admins. Call with uid from Firebase Auth. */
+export async function isAllowedAdmin(uid) {
+  if (!uid) return false;
+  const db = firestore();
+  const snap = await getDoc(doc(db, ALLOWED_ADMINS, uid));
+  return snap.exists();
+}
+
+/** Submit or update a login request (for unapproved users). Doc id = uid. */
+export async function submitLoginRequest({ uid, email, displayName }) {
+  const db = firestore();
+  const ref = doc(db, LOGIN_REQUESTS, uid);
+  const existing = await getDoc(ref);
+  await setDoc(
+    ref,
+    {
+      uid,
+      email: email || null,
+      displayName: displayName || null,
+      requestedAt: existing?.exists?.() ? existing.data().requestedAt : serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+/** List pending login requests (only allowed admins can call). */
+export async function listLoginRequests() {
+  const db = firestore();
+  const q = query(
+    collection(db, LOGIN_REQUESTS),
+    orderBy("updatedAt", "desc"),
+    limit(100)
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      uid: data.uid,
+      email: data.email,
+      displayName: data.displayName,
+      requestedAt: data.requestedAt?.toDate?.()?.toISOString?.() ?? data.requestedAt,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() ?? data.updatedAt,
+    };
+  });
+}
+
+/** Approve a user: add to allowed_admins and remove from login_requests. */
+export async function approveAdmin({ uid, email, displayName }) {
+  const db = firestore();
+  await setDoc(doc(db, ALLOWED_ADMINS, uid), {
+    email: email || null,
+    displayName: displayName || null,
+    approvedAt: serverTimestamp(),
+  });
+  const loginRef = doc(db, LOGIN_REQUESTS, uid);
+  const snap = await getDoc(loginRef);
+  if (snap.exists()) await deleteDoc(loginRef);
 }

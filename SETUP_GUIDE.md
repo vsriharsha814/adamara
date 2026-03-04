@@ -96,6 +96,13 @@ In your Firebase project:
 
 > The app uses Firestore collections to store ad requests; no additional schema setup is required.
 
+### 5.3 Admin access (allowlist)
+
+Admin sign-in is **allowlist-based**: only users you approve can access the admin area.
+
+- **First admin:** There is no admin until you create one. In Firebase Console → **Firestore Database**, create a collection named **`allowed_admins`**. Add a document with **document ID = your Firebase Auth UID** (you can get this by trying to sign in once at `/admin/login`; the “Access pending” screen will show your UID and instructions). You can leave the document empty or add fields like `email` and `displayName`. Save, then sign in again — you will have access.
+- **More admins:** After that, any other user who tries to sign in will see “Your request has been submitted…”. As an existing admin, open the **Dashboard**; you will see a **Pending access requests** section. Click **Approve** to allow that user. They can then sign in and see the admin pages.
+
 ---
 
 ## 6. Install dependencies
