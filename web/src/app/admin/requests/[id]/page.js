@@ -112,43 +112,6 @@ function RequestDetailInner() {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  const getFileIcon = (fileType) => {
-    if (fileType?.includes("image")) {
-      return (
-        <svg className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      );
-    }
-    if (fileType?.includes("pdf")) {
-      return (
-        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-          />
-        </svg>
-      );
-    }
-    return (
-      <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-    );
-  };
-
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -321,32 +284,33 @@ function RequestDetailInner() {
             </div>
           )}
 
-          {request.files && request.files.length > 0 && (
+          {request.images && request.images.length > 0 && (
             <div className="overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-black/5 dark:bg-white/5 dark:ring-white/10">
               <div className="border-b border-gray-200 px-6 py-4 dark:border-white/10">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Attachments</h2>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-slate-100">Images</h2>
               </div>
-              <ul className="divide-y divide-gray-200 dark:divide-white/10">
-                {request.files.map((file, index) => (
-                  <li key={index} className="flex items-center p-4">
-                    {getFileIcon(file.fileType)}
-                    <div className="ml-3 flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-slate-100">{file.originalName}</p>
-                      <p className="text-xs text-gray-500 dark:text-slate-300">
-                        {(file.fileSize / 1024 / 1024).toFixed(2)} MB • Uploaded {formatDate(file.uploadDate)}
+              <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+                {request.images.map((img, index) => (
+                  <figure key={index} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-white/10 dark:bg-white/5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img.dataUrl}
+                      alt={img.name || `Image ${index + 1}`}
+                      className="h-40 w-full object-cover"
+                    />
+                    <figcaption className="space-y-1 p-3">
+                      <p className="truncate text-sm font-medium text-gray-900 dark:text-slate-100">
+                        {img.name || `Image ${index + 1}`}
                       </p>
-                    </div>
-                    <a
-                      href={file.fileURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-md bg-blue-100 px-3 py-1 text-blue-700 hover:bg-blue-200 dark:bg-blue-500/15 dark:text-blue-200 dark:hover:bg-blue-500/20"
-                    >
-                      View
-                    </a>
-                  </li>
+                      {img.size && (
+                        <p className="text-xs text-gray-500 dark:text-slate-300">
+                          {(img.size / 1024).toFixed(1)} KB
+                        </p>
+                      )}
+                    </figcaption>
+                  </figure>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>

@@ -12,22 +12,14 @@ import {
   limit,
   serverTimestamp,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getFirestoreSafe, getStorageSafe } from "@/lib/firebaseClient";
+import { getFirestoreSafe } from "@/lib/firebaseClient";
 
 const REQUESTS = "requests";
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 function firestore() {
   const db = getFirestoreSafe();
   if (!db) throw new Error("Firestore not available");
   return db;
-}
-
-function storage() {
-  const s = getStorageSafe();
-  if (!s) throw new Error("Storage not available");
-  return s;
 }
 
 /** Convert Firestore doc to plain object with id and date fields */
@@ -53,7 +45,7 @@ function docToRequest(docSnap) {
     adTitle: d.adTitle,
     adDescription: d.adDescription,
     specialInstructions: d.specialInstructions,
-    files: Array.isArray(d.files) ? d.files : [],
+    images: Array.isArray(d.images) ? d.images : [],
     status: d.status || "pending",
     assignedTo: d.assignedTo ?? null,
     adminNotes: Array.isArray(d.adminNotes) ? d.adminNotes : [],
@@ -61,32 +53,11 @@ function docToRequest(docSnap) {
   };
 }
 
-/** Create a new ad request (public form). Optionally upload files to Storage. */
-export async function createRequest(payload, files = []) {
+/** Create a new ad request (public form). */
+export async function createRequest(payload) {
   const db = firestore();
   const col = collection(db, REQUESTS);
   const requestId = doc(col).id;
-
-  let fileEntries = [];
-  if (files.length > 0) {
-    const st = storage();
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.size > MAX_FILE_SIZE) throw new Error(`File ${file.name} exceeds 10MB`);
-      const path = `requests/${requestId}/${Date.now()}-${file.name}`;
-      const storageRef = ref(st, path);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      fileEntries.push({
-        originalName: file.name,
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: file.size,
-        fileURL: url,
-        uploadDate: new Date(),
-      });
-    }
-  }
 
   const data = {
     ...payload,
@@ -98,7 +69,6 @@ export async function createRequest(payload, files = []) {
     requestDate: serverTimestamp(),
     lastUpdated: serverTimestamp(),
     status: "pending",
-    files: fileEntries,
   };
   await setDoc(doc(db, REQUESTS, requestId), data);
   return requestId;

@@ -44,7 +44,7 @@ export default function RequestPage() {
       { name: "Ad details", component: <AdDetails /> },
       { name: "Timeline", component: <Timeline /> },
       { name: "Content", component: <ContentInfo /> },
-      { name: "Files", component: <FileUpload files={files} setFiles={setFiles} /> },
+      { name: "Images", component: <FileUpload files={files} setFiles={setFiles} /> },
       { name: "Done", component: <Confirmation /> },
     ],
     [files]
@@ -57,11 +57,31 @@ export default function RequestPage() {
     if (step > 0) setStep(step - 1);
   };
 
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     setSubmitError("");
 
     try {
+      let images = [];
+      if (files.length > 0) {
+        images = await Promise.all(
+          files.map(async (file) => ({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            dataUrl: await fileToDataUrl(file),
+          }))
+        );
+      }
+
       const payload = {
         requesterName: data.requesterName,
         requesterEmail: data.requesterEmail,
@@ -76,8 +96,9 @@ export default function RequestPage() {
         adTitle: data.adTitle || null,
         adDescription: data.adDescription || null,
         specialInstructions: data.specialInstructions || null,
+        images,
       };
-      const id = await createRequest(payload, files);
+      const id = await createRequest(payload);
       setRequestId(id);
       setStep(steps.length - 1);
     } catch (error) {

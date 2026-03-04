@@ -40,9 +40,9 @@ export default function Home() {
               </p>
             </div>
             <div className="rounded-lg border border-black/5 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-              <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">File uploads</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-slate-100">Structured inputs</p>
               <p className="mt-1 text-sm text-gray-600 dark:text-slate-300">
-                Add images/PDFs in one place (up to 5).
+                Capture timelines, audiences, and requirements in one place.
               </p>
             </div>
             <div className="rounded-lg border border-black/5 bg-white p-4 dark:border-white/10 dark:bg-white/5">
@@ -101,7 +101,7 @@ export default function Home() {
                 Tip for fast approvals
               </p>
               <p className="mt-1 text-sm text-amber-800 dark:text-amber-100/80">
-                Upload brand assets (logo/guide) and include a clear call-to-action.
+                Include key brand guidelines and a clear call-to-action in your request.
               </p>
             </div>
           </div>

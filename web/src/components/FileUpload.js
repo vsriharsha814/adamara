@@ -9,9 +9,11 @@ export default function FileUpload({ files, setFiles }) {
   const [dragActive, setDragActive] = useState(false);
   const [fileError, setFileError] = useState("");
 
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;
-  const ALLOWED_TYPES = ["image/jpeg", "image/png", "application/pdf"];
-  const MAX_FILES = 5;
+  // Store lightweight image data directly in Firestore, so we keep
+  // strict limits below Firestore's per-document size cap.
+  const MAX_FILE_SIZE = 150 * 1024; // 150KB
+  const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+  const MAX_FILES = 3;
 
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -34,13 +36,13 @@ export default function FileUpload({ files, setFiles }) {
         const file = uploadedFiles[i];
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-          setFileError("Invalid file type. Only JPEG, PNG, and PDF files are allowed.");
+          setFileError("Invalid file type. Only JPEG and PNG images are allowed.");
           return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
           setFileError(
-            `File too large: ${file.name}. Maximum size is ${formatFileSize(MAX_FILE_SIZE)}`
+            `Image too large: ${file.name}. Maximum size is ${formatFileSize(MAX_FILE_SIZE)}`
           );
           return;
         }
@@ -99,19 +101,6 @@ export default function FileUpload({ files, setFiles }) {
       );
     }
 
-    if (fileType.includes("pdf")) {
-      return (
-        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-          />
-        </svg>
-      );
-    }
-
     return (
       <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
@@ -126,9 +115,9 @@ export default function FileUpload({ files, setFiles }) {
 
   return (
     <div>
-      <h2 className="mb-1 text-xl font-semibold">Attachments</h2>
+      <h2 className="mb-1 text-xl font-semibold">Images</h2>
       <p className="mb-5 text-sm text-gray-600">
-        Upload supporting files (logos, references, copy docs). JPEG/PNG/PDF only.
+        Upload reference images (logos, layouts, mocks). JPEG/PNG only.
       </p>
 
       <div className="space-y-4">
@@ -145,7 +134,7 @@ export default function FileUpload({ files, setFiles }) {
             type="file"
             id="fileUpload"
             multiple
-            accept=".jpg,.jpeg,.png,.pdf"
+            accept=".jpg,.jpeg,.png"
             onChange={handleChange}
             className="hidden"
           />
@@ -161,10 +150,10 @@ export default function FileUpload({ files, setFiles }) {
                 />
               </svg>
               <p className="text-lg font-medium text-gray-700">
-                Drag &amp; drop files, or <span className="text-blue-600">browse</span>
+                Drag &amp; drop images, or <span className="text-blue-600">browse</span>
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                JPEG, PNG, PDF • up to 10MB each • max {MAX_FILES} files
+                JPEG/PNG • up to {formatFileSize(MAX_FILE_SIZE)} each • max {MAX_FILES} images
               </p>
             </div>
           </label>
@@ -175,7 +164,7 @@ export default function FileUpload({ files, setFiles }) {
         {files.length > 0 && (
           <div className="mt-4">
             <h3 className="mb-2 font-medium">
-              Uploaded files ({files.length}/{MAX_FILES})
+              Uploaded images ({files.length}/{MAX_FILES})
             </h3>
             <ul className="divide-y rounded-md border">
               {files.map((file, index) => (
@@ -204,13 +193,12 @@ export default function FileUpload({ files, setFiles }) {
         )}
 
         <div className="rounded-md bg-gray-50 p-4 text-sm text-gray-600">
-          <h3 className="mb-2 font-medium text-gray-800">File requirements</h3>
+          <h3 className="mb-2 font-medium text-gray-800">Image requirements</h3>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Maximum {MAX_FILES} files</li>
-            <li>Accepted formats: JPEG, PNG, PDF</li>
-            <li>Maximum size: 10MB per file</li>
-            <li>For images: 800×600px+ recommended</li>
-            <li>For PDFs: ensure text is readable and images are high-quality</li>
+            <li>Maximum {MAX_FILES} images</li>
+            <li>Accepted formats: JPEG, PNG</li>
+            <li>Maximum size: {formatFileSize(MAX_FILE_SIZE)} per image</li>
+            <li>Use web-ready exports so previews load quickly.</li>
           </ul>
         </div>
       </div>
