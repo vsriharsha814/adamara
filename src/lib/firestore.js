@@ -18,6 +18,7 @@ import { getFirestoreSafe } from "@/lib/firebaseClient";
 const REQUESTS = "requests";
 const ALLOWED_ADMINS = "allowed_admins";
 const LOGIN_REQUESTS = "login_requests";
+const USERS = "users";
 
 function firestore() {
   const db = getFirestoreSafe();
@@ -210,7 +211,7 @@ export async function isAllowedAdmin(uid) {
   return snap.exists();
 }
 
-/** Submit or update a login request (for unapproved users). Doc id = uid. Uses only create/update (no read) so it works without read permission. */
+/** Submit or update a login request (for unapproved users). Doc id = uid. makeAdmin defaults to false so you can edit it in Console. */
 export async function submitLoginRequest({ uid, email, displayName }) {
   const db = firestore();
   const ref = doc(db, LOGIN_REQUESTS, uid);
@@ -220,6 +221,7 @@ export async function submitLoginRequest({ uid, email, displayName }) {
       uid,
       email: email || null,
       displayName: displayName || null,
+      makeAdmin: false,
       requestedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     },
@@ -250,7 +252,21 @@ export async function listLoginRequests() {
   });
 }
 
-/** Approve a user: add to allowed_admins and remove from login_requests. */
+/** Create or update user doc with admin permission. */
+async function setUserAdmin(db, uid, email, displayName) {
+  await setDoc(
+    doc(db, USERS, uid),
+    {
+      email: email ?? null,
+      displayName: displayName ?? null,
+      admin: true,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+/** Approve a user: add to allowed_admins, create user with admin true, remove from login_requests. */
 export async function approveAdmin({ uid, email, displayName }) {
   const db = firestore();
   await setDoc(doc(db, ALLOWED_ADMINS, uid), {
@@ -258,6 +274,7 @@ export async function approveAdmin({ uid, email, displayName }) {
     displayName: displayName || null,
     approvedAt: serverTimestamp(),
   });
+  await setUserAdmin(db, uid, email, displayName);
   const loginRef = doc(db, LOGIN_REQUESTS, uid);
   const snap = await getDoc(loginRef);
   if (snap.exists()) await deleteDoc(loginRef);
@@ -272,7 +289,7 @@ export async function setLoginRequestMakeAdmin(uid) {
   });
 }
 
-/** If login_requests doc has makeAdmin true, create allowed_admins and delete login_request. Call after sign-in when not yet allowed. Returns true if admin was created. */
+/** If login_requests doc has makeAdmin true, create allowed_admins, create user with admin true, delete login_request. Call after sign-in when not yet allowed. Returns true if admin was created. */
 export async function createAdminIfMakeAdmin({ uid, email, displayName }) {
   const db = firestore();
   const loginSnap = await getDoc(doc(db, LOGIN_REQUESTS, uid));
@@ -283,6 +300,7 @@ export async function createAdminIfMakeAdmin({ uid, email, displayName }) {
     approvedAt: serverTimestamp(),
     approvedVia: "makeAdmin",
   });
+  await setUserAdmin(db, uid, email, displayName);
   await deleteDoc(doc(db, LOGIN_REQUESTS, uid));
   return true;
 }

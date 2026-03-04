@@ -37,5 +37,12 @@ service cloud.firestore {
       allow update, read: if request.auth != null && (request.auth.uid == requestId || isAllowedAdmin());
       allow delete: if isAllowedAdmin();
     }
+
+    // Users: each user can read/write their own doc (e.g. when granted admin); admins can read all.
+    match /users/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAllowedAdmin());
+      allow create, update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if isAllowedAdmin();
+    }
   }
 }
