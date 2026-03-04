@@ -40,15 +40,9 @@ export default function ContactPage() {
             <div>
               <h2 className="mb-1 text-xl font-semibold text-gray-900">Phone</h2>
               <p className="text-gray-600">
-                <a href="tel:+91-9876543210" className="hover:text-blue-600">
-                  +91 987 654 3210
+                <a href="tel:+918341005466" className="hover:text-blue-600">
+                  +91 8341005466
                 </a>
-              </p>
-              <p className="text-gray-600">
-                <a href="tel:+91-1234567890" className="hover:text-blue-600">
-                  +91 123 456 7890
-                </a>{" "}
-                (Toll-free)
               </p>
             </div>
           </div>
@@ -60,15 +54,9 @@ export default function ContactPage() {
             <div>
               <h2 className="mb-1 text-xl font-semibold text-gray-900">Email</h2>
               <p className="text-gray-600">
-                <a href="mailto:info@amaravaticommunications.com" className="hover:text-blue-600">
-                  info@amaravaticommunications.com
+                <a href="mailto:amaravaticommunications@gmail.com" className="hover:text-blue-600">
+                  amaravaticommunications@gmail.com
                 </a>
-              </p>
-              <p className="text-gray-600">
-                <a href="mailto:support@adamara.com" className="hover:text-blue-600">
-                  support@adamara.com
-                </a>{" "}
-                (Support)
               </p>
             </div>
           </div>
@@ -84,11 +72,11 @@ export default function ContactPage() {
 
           <div className="space-y-5">
             <div className="border-b border-gray-200 pb-4">
-              <h3 className="font-medium text-gray-900">Rajesh Kumar</h3>
-              <p className="text-sm text-blue-600">Chief Executive Officer</p>
+              <h3 className="font-medium text-gray-900">Hareesh Babu Vallabhaneni</h3>
+              <p className="text-sm text-blue-600">Chairman</p>
               <p className="text-sm text-gray-600">
-                <a href="mailto:rajesh.kumar@amaravaticommunications.com" className="hover:text-blue-600">
-                  rajesh.kumar@amaravaticommunications.com
+                <a href="mailto:vallabhanenihb@gmail.com" className="hover:text-blue-600">
+                  vallabhanenihb@gmail.com
                 </a>
               </p>
             </div>

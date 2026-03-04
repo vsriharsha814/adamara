@@ -36,10 +36,7 @@ const ContactUs = () => {
             <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-1">Phone</h2>
               <p className="text-gray-600">
-                <a href="tel:+91-9876543210" className="hover:text-blue-600">+91 987 654 3210</a>
-              </p>
-              <p className="text-gray-600">
-                <a href="tel:+91-1234567890" className="hover:text-blue-600">+91 123 456 7890</a> (Toll-free)
+                <a href="tel:+918341005466" className="hover:text-blue-600">+91 8341005466</a>
               </p>
             </div>
           </div>
@@ -51,10 +48,7 @@ const ContactUs = () => {
             <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-1">Email</h2>
               <p className="text-gray-600">
-                <a href="mailto:info@amaravaticommunications.com" className="hover:text-blue-600">info@amaravaticommunications.com</a>
-              </p>
-              <p className="text-gray-600">
-                <a href="mailto:support@adamara.com" className="hover:text-blue-600">support@adamara.com</a> (Support)
+                <a href="mailto:amaravaticommunications@gmail.com" className="hover:text-blue-600">amaravaticommunications@gmail.com</a>
               </p>
             </div>
           </div>
@@ -71,13 +65,13 @@ const ContactUs = () => {
           
           <div className="space-y-5">
             <div className="border-b border-gray-200 pb-4">
-              <h3 className="font-medium text-gray-800">Rajesh Kumar</h3>
-              <p className="text-sm text-blue-600">Chief Executive Officer</p>
+              <h3 className="font-medium text-gray-800">Hareesh Babu Vallabhaneni</h3>
+              <p className="text-sm text-blue-600">Chairman</p>
               <p className="text-sm text-gray-600">
-                <a href="mailto:rajesh.kumar@amaravaticommunications.com" className="hover:text-blue-600">rajesh.kumar@amaravaticommunications.com</a>
+                <a href="mailto:vallabhanenihb@gmail.com" className="hover:text-blue-600">vallabhanenihb@gmail.com</a>
               </p>
               <p className="text-sm text-gray-600">
-                <a href="tel:+91-9876543210" className="hover:text-blue-600">+91 987 654 3210</a>
+                <a href="tel:+918341005466" className="hover:text-blue-600">+91 8341005466</a>
               </p>
             </div>
             
@@ -88,7 +82,7 @@ const ContactUs = () => {
                 <a href="mailto:priya.sharma@amaravaticommunications.com" className="hover:text-blue-600">priya.sharma@amaravaticommunications.com</a>
               </p>
               <p className="text-sm text-gray-600">
-                <a href="tel:+91-9876543211" className="hover:text-blue-600">+91 987 654 3211</a>
+                <a href="tel:+918341005466" className="hover:text-blue-600">+91 8341005466</a>
               </p>
             </div>
             
@@ -99,7 +93,7 @@ const ContactUs = () => {
                 <a href="mailto:anand.patel@amaravaticommunications.com" className="hover:text-blue-600">anand.patel@amaravaticommunications.com</a>
               </p>
               <p className="text-sm text-gray-600">
-                <a href="tel:+91-9876543212" className="hover:text-blue-600">+91 987 654 3212</a>
+                <a href="tel:+918341005466" className="hover:text-blue-600">+91 8341005466</a>
               </p>
             </div>
           </div>
