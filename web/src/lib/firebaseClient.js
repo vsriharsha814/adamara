@@ -12,9 +12,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+const hasValidConfig =
+  typeof firebaseConfig.apiKey === "string" &&
+  firebaseConfig.apiKey.length > 0 &&
+  !firebaseConfig.apiKey.startsWith("your_");
+
 // Only init on client; avoid re-initializing in Next dev / hot reload
 function getAppSafe() {
   if (typeof window === "undefined") return null;
+  if (!hasValidConfig) return null;
   return getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
